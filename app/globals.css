@@ -125,3 +125,21 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  @keyframes color-cycle-fast {
+    0% { background-color: #ef4444; }
+    20% { background-color: #f59e0b; }
+    40% { background-color: #10b981; }
+    60% { background-color: #3b82f6; }
+    80% { background-color: #8b5cf6; }
+    100% { background-color: #ef4444; }
+  }
+  .border-cycle-on-hover {
+    background-color: #d9d9d9; /* gray-500 when not hovered */
+  }
+  
+  .border-cycle-on-hover:hover {
+    animation: color-cycle-fast 1.5s linear infinite;
+  }
+}
