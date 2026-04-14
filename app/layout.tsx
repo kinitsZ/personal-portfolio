@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Playfair_Display, DM_Sans, Poppins } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import localFont from 'next/font/local';
@@ -36,6 +36,24 @@ const montserrat = Montserrat({
   variable: '--font-montserrat',
 })
 
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  weight: ['400', '700', '900'],
+  variable: '--font-playfair',
+})
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500'],
+  variable: '--font-dm-sans',
+})
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-poppins',
+})
+
 export const bitter = Bitter({
   subsets: ['latin'],
   weight: ['400', '700'],
@@ -65,7 +83,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${sfPro.className} ${bitter.variable}`}
+        className={`${sfPro.className} ${bitter.variable} ${playfair.variable} ${dmSans.variable} ${poppins.variable}`}
       >
         <ThemeProvider
           attribute='class'

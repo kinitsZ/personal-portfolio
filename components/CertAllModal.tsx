@@ -46,6 +46,12 @@ const certs = [
     date: "May 2025",
     imageUrl: "/certification/Java Programmers for Beginners.png",
   },
+  {
+    name: "Data Visualization with Python",
+    issuer: "IBM · Coursera",
+    date: "May 2025",
+    imageUrl: "/certification/Data Visualization with Python.png",
+  },
 ]
 
 const CertAllModal = () => {
@@ -113,7 +119,7 @@ const CertAllModal = () => {
       {/* Lightbox from grid */}
       {lightbox !== null && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 backdrop-blur-sm"
           onClick={() => setLightbox(null)}
         >
           <div

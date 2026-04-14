@@ -53,6 +53,12 @@ const certs: Cert[] = [
     date: "May 2025",
     imageUrl: "/certification/Java Programmers for Beginners.png",
   },
+  {
+    name: "Data Visualization with Python",
+    issuer: "IBM · Coursera",
+    date: "May 2025",
+    imageUrl: "/certification/Data Visualization with Python.png",
+  },
 ]
 
 const CertCarousel = () => {
