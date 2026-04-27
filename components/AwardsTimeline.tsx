@@ -37,12 +37,12 @@ const AwardsTimeline = () => {
             {/* Dot */}
             <div className="absolute left-[-3.5px] top-1.5 w-2 h-2 rounded-full border-2 border-[#d0d0d0] bg-white group-hover:border-[#4E4E4E] transition-colors" />
 
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col gap-0.5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-0.5 min-w-0">
                 <p className="text-sm font-medium text-[#4E4E4E] leading-snug">{award.title}</p>
                 <p className="text-xs text-[#ababab] leading-snug">{award.event}</p>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex flex-col items-end gap-1 shrink-0">
                 <p className="text-xs text-[#c8c8c8] whitespace-nowrap">{award.date}</p>
                 {award.url && (
                   <a

@@ -16,7 +16,7 @@ const ProjectCard = ({ title, description, imageUrl, siteUrl, githubUrl }: Proje
     <div className="group relative w-full cursor-pointer rounded-2xl overflow-hidden h-[310px] ring-1 ring-black/6 group-hover:ring-black/10 transition-all duration-700">
 
       {/* Image */}
-      <div className="absolute inset-0 grayscale blur-[1.5px] group-hover:grayscale-0 group-hover:filter-none transition-all duration-700">
+      <div className="absolute inset-0 grayscale-40 group-hover:grayscale-0 group-hover:filter-none transition-all duration-700">
         {imageUrl ? (
           <Image
             src={imageUrl}
