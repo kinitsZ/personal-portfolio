@@ -91,7 +91,7 @@ export default function Home() {
             <StackBar stack="CSS3" />
             <StackBar stack="JavaScript" />
             <StackBar stack="TailwindCSS" />
-            <StackBar stack="Redis" />
+            {/* <StackBar stack="Redis" /> */}
             <StackBar stack="Python" />
             <StackBar stack="PostgreSQL" />
             <StackBar stack="Supabase" />
