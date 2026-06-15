@@ -44,7 +44,7 @@ const AwardsTimeline = () => {
               </div>
               <div className="flex flex-col items-end gap-1 shrink-0">
                 <p className="text-xs text-[#c8c8c8] whitespace-nowrap">{award.date}</p>
-                {award.url && (
+                {/* {award.url && (
                   <a
                     href={award.url}
                     target="_blank"
@@ -53,7 +53,7 @@ const AwardsTimeline = () => {
                   >
                     View
                   </a>
-                )}
+                )} */}
               </div>
             </div>
           </div>

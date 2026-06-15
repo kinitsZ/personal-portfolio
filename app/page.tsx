@@ -228,13 +228,13 @@ export default function Home() {
             </a>
 
             {/* Phone */}
-            <a href="tel:+639563545164" className="flex items-center gap-3 p-3 rounded-xl bg-[#f9f9f9] hover:bg-[#f2f2f2] transition-colors group">
+            <a href="tel:+639693695916" className="flex items-center gap-3 p-3 rounded-xl bg-[#f9f9f9] hover:bg-[#f2f2f2] transition-colors group">
               <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
                 <Phone size={14} className="text-[#9a9a9a]" />
               </div>
               <div>
                 <p className="text-[10px] text-[#c0c0c0]">Phone</p>
-                <p className="text-xs font-medium text-[#4E4E4E] group-hover:text-[#2a2a2a] transition-colors">+63 956 354 5164</p>
+                <p className="text-xs font-medium text-[#4E4E4E] group-hover:text-[#2a2a2a] transition-colors">+63 969 369 5916</p>
               </div>
             </a>
 
