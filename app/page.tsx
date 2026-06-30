@@ -1,319 +1,1152 @@
+"use client";
+
 import Image from "next/image";
-import { User, Layers, FolderGit2, GraduationCap, Trophy, BadgeCheck, Briefcase, Mail, Phone, Download } from "lucide-react";
-import StackBar from "@/components/StackBar";
-import CertCarousel from "@/components/CertCarousel";
-import CertAllModal from "@/components/CertAllModal";
+import { ArrowRight, Briefcase, Download, GraduationCap, Mail, Phone } from "lucide-react";
 import AwardsTimeline from "@/components/AwardsTimeline";
 import ProjectCard from "@/components/ProjectCard";
-import LiveClock from "@/components/LiveClock";
-import ProfilePic from "@/components/ProfilePic";
+import StackBar from "@/components/StackBar";
+import RevealObserver from "@/components/RevealObserver";
+
+/* ── Reusable sub-components ────────────────────────────── */
+
+function SectionHeader({ num, title }: { num: string; title: string }) {
+  return (
+    <div className="flex items-center gap-4 mb-10">
+      <span
+        style={{
+          fontFamily: "var(--font-mono)",
+          color: "var(--accent)",
+          letterSpacing: "0.18em",
+          fontSize: "11px",
+          fontWeight: 400,
+          flexShrink: 0,
+        }}
+      >
+        {num}
+      </span>
+      <h2
+        style={{
+          fontFamily: "var(--font-serif)",
+          color: "var(--ink)",
+          lineHeight: 0.95,
+          fontSize: "clamp(30px, 4.4vw, 48px)",
+          flexShrink: 0,
+        }}
+      >
+        {title}
+      </h2>
+      <div
+        style={{ height: "1px", background: "var(--line)", flex: 1 }}
+      />
+    </div>
+  );
+}
+
+function ContactCard({
+  href,
+  icon,
+  label,
+  value,
+  filled,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  filled?: boolean;
+}) {
+  return (
+    <a
+      href={href}
+      target={href.startsWith("http") ? "_blank" : undefined}
+      rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
+      data-reveal
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "14px",
+        padding: "16px 18px",
+        borderRadius: "14px",
+        background: filled ? "var(--ink)" : "var(--bg2)",
+        border: `1px solid ${filled ? "var(--ink)" : "var(--line)"}`,
+        transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease",
+        textDecoration: "none",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.boxShadow = "var(--shadow)";
+        if (!filled) e.currentTarget.style.borderColor = "var(--accent)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "none";
+        if (!filled) e.currentTarget.style.borderColor = "var(--line)";
+      }}
+    >
+      <div
+        style={{
+          width: "38px",
+          height: "38px",
+          borderRadius: "10px",
+          background: filled ? "rgba(255,255,255,0.12)" : "var(--bg)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          color: filled ? "white" : "var(--accent)",
+        }}
+      >
+        {icon}
+      </div>
+      <div>
+        <p
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "10px",
+            letterSpacing: "0.14em",
+            color: filled ? "rgba(255,255,255,0.5)" : "var(--faint)",
+            textTransform: "uppercase",
+            marginBottom: "2px",
+          }}
+        >
+          {label}
+        </p>
+        <p
+          style={{
+            fontSize: "13px",
+            fontWeight: 600,
+            color: filled ? "white" : "var(--ink)",
+            fontFamily: "var(--font-sans)",
+          }}
+        >
+          {value}
+        </p>
+      </div>
+    </a>
+  );
+}
+
+const CERT_LIST = [
+  "Data Visualization with Python",
+  "Introduction to Software Engineering",
+  "Introduction to HTML, CSS & JavaScript",
+  "Java Programming for Beginners",
+  "Excel Associate",
+];
+
+const STACK = [
+  "Next.js",
+  "React",
+  "Vue.js",
+  "Node.js",
+  "TypeScript",
+  "JavaScript",
+  "TailwindCSS",
+  "HTML5",
+  "CSS3",
+  "Python",
+  "PostgreSQL",
+  "Supabase",
+  "Vercel",
+  "Git & GitHub",
+  "Figma",
+];
+
+/* ── Page ────────────────────────────────────────────────── */
 
 export default function Home() {
   return (
-    <div className="relative">
-      {/* Grid background overlay */}
-      <div className="absolute inset-0 grid-background pointer-events-none" />
-      {/* MAIN-content container */}
-      <div className="max-w-2xl mx-auto mt-10 sm:mt-20 px-4 sm:px-2">
+    <>
+      <RevealObserver />
 
-        {/* HEADER section */}
-        <div className="flex justify-between items-start mb-6 gap-3">
-          <div className="flex gap-3 items-center min-w-0">
-            <ProfilePic />
-            <div className="flex flex-col gap-1 min-w-0">
-              <LiveClock />
-              <p className="text-base sm:text-2xl text-[#4E4E4E] font-medium">Hello, I am Zymer!</p>
-              <div className="flex flex-wrap gap-2 sm:gap-3 mt-0.5 items-center">
-                <a href="https://www.linkedin.com/in/zymer-fernando-24baa5259/" target="_blank" rel="noopener noreferrer" className="text-[#b0b0b0] hover:text-[#4E4E4E] transition-colors">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-                </a>
-                <a href="https://github.com/kinitsZ" target="_blank" rel="noopener noreferrer" className="text-[#b0b0b0] hover:text-[#4E4E4E] transition-colors">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                </a>
-                <a href="https://www.facebook.com/zymer.fernando.2024" target="_blank" rel="noopener noreferrer" className="text-[#b0b0b0] hover:text-[#4E4E4E] transition-colors">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                </a>
-                <span className="text-[#e0e0e0] hidden sm:inline">·</span>
-                <div className="hidden sm:flex items-center gap-1.5">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
+      {/* Page wrapper — left pad reserves the side rail on desktop */}
+      <div
+        style={{
+          maxWidth: "920px",
+          margin: "0 auto",
+          padding: "0 28px 0 28px",
+        }}
+        className="md:pl-28"
+      >
+        {/* ── 1. HERO ─────────────────────────────────────── */}
+        <section
+          id="top"
+          data-sec="top"
+          style={{ scrollMarginTop: "48px", paddingTop: "120px", paddingBottom: "64px" }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-10 md:gap-12 items-center">
+            {/* Left */}
+            <div data-reveal className="order-2 md:order-1">
+              {/* Kicker */}
+              <p
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "10.5px",
+                  letterSpacing: "0.22em",
+                  color: "var(--muted-text)",
+                  textTransform: "uppercase",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  marginBottom: "20px",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "50%",
+                    background: "var(--accent)",
+                    flexShrink: 0,
+                  }}
+                />
+                Full-Stack Developer · Data Science
+              </p>
+
+              {/* Hero name */}
+              <h1
+                style={{
+                  fontFamily: "var(--font-serif)",
+                  lineHeight: 0.86,
+                  letterSpacing: "-0.01em",
+                  fontSize: "clamp(58px, 9.5vw, 128px)",
+                  marginBottom: "28px",
+                }}
+              >
+                <span style={{ color: "var(--ink)", display: "block" }}>Zymer</span>
+                <span style={{ color: "var(--faint)", display: "block" }}>Fernando</span>
+              </h1>
+
+              {/* Lede */}
+              <p
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "clamp(17px, 1.9vw, 21px)",
+                  lineHeight: 1.55,
+                  color: "var(--muted-text)",
+                  maxWidth: "30ch",
+                  marginBottom: "28px",
+                }}
+              >
+                I build{" "}
+                <strong style={{ color: "var(--ink)", fontWeight: 600 }}>
+                  full-stack web applications
+                </strong>{" "}
+                where speed, security, and clean architecture are the foundation —
+                not the afterthought.
+              </p>
+
+              {/* Meta row */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "16px",
+                  marginBottom: "32px",
+                }}
+              >
+                {/* Available badge */}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ position: "relative", display: "inline-flex", width: "8px", height: "8px" }}>
+                    <span
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        borderRadius: "50%",
+                        background: "oklch(0.7 0.17 150)",
+                        animation: "ping-avail 1.4s cubic-bezier(0,0,0.2,1) infinite",
+                      }}
+                    />
+                    <span
+                      style={{
+                        position: "relative",
+                        display: "inline-flex",
+                        width: "8px",
+                        height: "8px",
+                        borderRadius: "50%",
+                        background: "oklch(0.62 0.18 150)",
+                      }}
+                    />
                   </span>
-                  <span className="text-[10px] text-[#ababab]">Available for work</span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "10.5px",
+                      letterSpacing: "0.1em",
+                      color: "oklch(0.62 0.18 150)",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    Available for work
+                  </span>
+                </div>
+
+                {/* Socials */}
+                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                  <SocialIcon href="https://www.linkedin.com/in/zymer-fernando-24baa5259/" label="LinkedIn">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                      <rect x="2" y="9" width="4" height="12" />
+                      <circle cx="4" cy="4" r="2" />
+                    </svg>
+                  </SocialIcon>
+                  <SocialIcon href="https://github.com/kinitsZ" label="GitHub">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                    </svg>
+                  </SocialIcon>
+                  <SocialIcon href="https://www.facebook.com/zymer.fernando.2024" label="Facebook">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                    </svg>
+                  </SocialIcon>
                 </div>
               </div>
-              {/* Available badge — moves below socials on mobile */}
-              <div className="flex sm:hidden items-center gap-1.5 mt-0.5">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
+
+              {/* CTAs */}
+              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "40px" }}>
+                <a
+                  href="#contact"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "11px 22px",
+                    borderRadius: "999px",
+                    background: "var(--ink)",
+                    color: "var(--bg)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                    transition: "opacity 0.2s ease, transform 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = "0.85";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = "1";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  Get in touch <ArrowRight size={14} />
+                </a>
+                <a
+                  href="/FERNANDOZYMER_RESUME.pdf"
+                  download
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "11px 22px",
+                    borderRadius: "999px",
+                    background: "transparent",
+                    color: "var(--ink)",
+                    border: "1px solid var(--line)",
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    transition: "border-color 0.2s ease, color 0.2s ease, transform 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "var(--accent)";
+                    e.currentTarget.style.color = "var(--accent)";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "var(--line)";
+                    e.currentTarget.style.color = "var(--ink)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  Download CV <Download size={14} />
+                </a>
+              </div>
+
+              {/* Scroll cue */}
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "10px",
+                    letterSpacing: "0.2em",
+                    color: "var(--faint)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Scroll to explore
                 </span>
-                <span className="text-[10px] text-[#ababab]">Available for work</span>
+                <div
+                  style={{
+                    width: "38px",
+                    height: "2px",
+                    background: "var(--line)",
+                    overflow: "hidden",
+                    borderRadius: "2px",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "var(--accent)",
+                      borderRadius: "2px",
+                      animation: "scroll-cue-bar 2.4s ease-in-out infinite",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right — hero portrait */}
+            <div
+              data-reveal
+              className="order-1 md:order-2 max-w-[300px] mx-auto md:max-w-none"
+            >
+              <div
+                style={{
+                  borderRadius: "16px",
+                  overflow: "hidden",
+                  border: "1px solid var(--line)",
+                  boxShadow: "var(--shadow)",
+                  position: "relative",
+                }}
+              >
+                <Image
+                  src="/assets/hero.jpg"
+                  alt="Zymer Fernando"
+                  width={480}
+                  height={656}
+                  priority
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    objectFit: "cover",
+                    objectPosition: "50% 22%",
+                    filter: "saturate(0.96)",
+                    display: "block",
+                  }}
+                />
+                {/* Scrim */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background:
+                      "linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 55%)",
+                  }}
+                />
+                {/* Tag top-left */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "14px",
+                    left: "14px",
+                    padding: "4px 10px",
+                    borderRadius: "999px",
+                    background: "rgba(0,0,0,0.35)",
+                    backdropFilter: "blur(6px)",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "10px",
+                    letterSpacing: "0.14em",
+                    color: "var(--accent)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  PH · 2026
+                </div>
+                {/* Caption */}
+                <p
+                  style={{
+                    position: "absolute",
+                    bottom: "16px",
+                    left: "16px",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "10px",
+                    letterSpacing: "0.26em",
+                    color: "rgba(255,255,255,0.75)",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Zymer Fernando
+                </p>
               </div>
             </div>
           </div>
-          <h1 className="text-sm sm:text-3xl drop-shadow-sm bg-linear-to-b from-[#d0d0d0] to-[#4a4a4a] bg-clip-text text-transparent text-right font-bold font-serif leading-tight shrink-0 self-center sm:self-start">
-            FULL STACK
-            <br />
-            WEB DEVELOPER
-          </h1>
-        </div>
+        </section>
 
-        <hr className="border-t-2 border-[#e0e0e0]" />
-
-        {/* ABOUT section */}
-        <div className="mt-7">
-          <div className="flex items-center gap-2 mb-3">
-            <User size={16} className="text-[#b0b0b0]" />
-            <h2 className="text-xl font-bold text-[#4E4E4E]">About</h2>
-          </div>
-          <p className="text-base leading-relaxed text-justify max-w-2xl bg-linear-to-r
-            from-[#9b9b9b] from-40%
-            to-[#3c3c3c] to-100%
-            bg-clip-text text-transparent">
-            I build full-stack websites with a focus on efficiency, security, and solid system architecture so users get smooth experiences without the chaos behind the scenes. I casually explore machine learning and data science, enjoying how data and smart systems can level up products. Curious by nature, I like building things that work well and actually matter.
-          </p>
-        </div>
-
-        <hr className="border-t-2 border-[#e0e0e0] mt-7" />
-
-        {/* TECH STACK section */}
-        <div className="mt-7">
-          <div className="flex items-center gap-2 mb-3">
-            <Layers size={16} className="text-[#b0b0b0]" />
-            <h2 className="text-xl font-bold text-[#4E4E4E]">Tech Stack</h2>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <StackBar stack="Next.js" />
-            <StackBar stack="Node.js" />
-            <StackBar stack="React" />
-            <StackBar stack="HTML5" />
-            <StackBar stack="CSS3" />
-            <StackBar stack="JavaScript" />
-            <StackBar stack="TailwindCSS" />
-            {/* <StackBar stack="Redis" /> */}
-            <StackBar stack="Python" />
-            <StackBar stack="PostgreSQL" />
-            <StackBar stack="Supabase" />
-            <StackBar stack="Vercel" />
-            <StackBar stack="Git & Github" />
-            <StackBar stack="Figma" />
-            <StackBar stack="Vue.js" />
-          </div>
-        </div>
-
-        <hr className="border-t-2 border-[#e0e0e0] mt-7" />
-
-        {/* WORK EXPERIENCE section */}
-        <div className="mt-7">
-          <div className="flex items-center gap-2 mb-4">
-            <Briefcase size={16} className="text-[#b0b0b0]" />
-            <h2 className="text-xl font-bold text-[#4E4E4E]">Work Experience</h2>
-          </div>
-          <div className="flex justify-between items-start">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#f5f5f5] flex items-center justify-center shrink-0">
-                <Briefcase size={16} className="text-[#b0b0b0]" />
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <p className="text-sm font-medium text-[#4E4E4E]">Junior Web Developer Intern</p>
-                <p className="text-xs text-[#ababab]">Circuit Solutions Inc.</p>
-              </div>
-            </div>
-            <div className="shrink-0 ml-4 text-right">
-              <p className="text-xs text-[#c8c8c8]">Mar 2026 – Jun 2026</p>
-              <div className="flex items-center justify-end gap-1 mt-0.5">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" />
+        {/* ── 2. ABOUT ─────────────────────────────────────── */}
+        <section
+          id="about"
+          data-sec="about"
+          style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
+        >
+          <SectionHeader num="01" title="About" />
+          <div className="grid grid-cols-1 md:grid-cols-[1.55fr_1fr] gap-11">
+            {/* Left */}
+            <div data-reveal>
+              <p
+                style={{
+                  fontFamily: "var(--font-serif)",
+                  fontSize: "clamp(19px, 2.3vw, 26px)",
+                  lineHeight: 1.5,
+                  color: "var(--ink)",
+                  marginBottom: "36px",
+                }}
+              >
+                I design and build full-stack systems that stay{" "}
+                <em
+                  style={{
+                    color: "var(--accent)",
+                    fontStyle: "italic",
+                    fontSize: "1.12em",
+                  }}
+                >
+                  fast, secure, and calm
+                </em>{" "}
+                under pressure. Lately I&apos;ve been drawn to machine learning and data
+                science — fascinated by how good data turns an ordinary product into an
+                intelligent one.{" "}
+                <span style={{ color: "var(--faint)" }}>
+                  Curious by default, I build things that work beautifully and actually
+                  matter.
                 </span>
-                <p className="text-xs text-green-500 font-medium">Current</p>
+              </p>
+
+              {/* Fact row */}
+              <div style={{ display: "flex", gap: "34px", flexWrap: "wrap" }}>
+                {[
+                  { num: "3+", label: "Years Building" },
+                  { num: "10+", label: "Projects & Comps" },
+                  { num: "5",  label: "Certifications" },
+                ].map(({ num, label }) => (
+                  <div key={label}>
+                    <p
+                      style={{
+                        fontFamily: "var(--font-serif)",
+                        fontSize: "30px",
+                        color: "var(--ink)",
+                        lineHeight: 1,
+                        marginBottom: "4px",
+                      }}
+                    >
+                      {num}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "10.5px",
+                        letterSpacing: "0.14em",
+                        color: "var(--faint)",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right — portrait */}
+            <div data-reveal className="w-full max-w-[300px] mx-auto md:max-w-none">
+              <div
+                style={{
+                  borderRadius: "14px",
+                  overflow: "hidden",
+                  border: "1px solid var(--line)",
+                  boxShadow: "var(--shadow)",
+                }}
+              >
+                <Image
+                  src="/assets/portrait.jpg"
+                  alt="Zymer Fernando seated"
+                  width={480}
+                  height={560}
+                  sizes="(max-width: 768px) 300px, 360px"
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    objectFit: "cover",
+                    objectPosition: "50% 16%",
+                    display: "block",
+                  }}
+                />
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <hr className="border-t-2 border-[#e0e0e0] mt-7" />
-
-        {/* PROJECTS section */}
-        <div className="mt-7">
-          <div className="flex items-center gap-2 mb-3">
-            <FolderGit2 size={16} className="text-[#b0b0b0]" />
-            <h2 className="text-xl font-bold text-[#4E4E4E]">Projects</h2>
+        {/* ── 3. TECH STACK ────────────────────────────────── */}
+        <section
+          id="stack"
+          data-sec="stack"
+          style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
+        >
+          <SectionHeader num="02" title="Tech Stack" />
+          <div data-reveal style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+            {STACK.map((s) => (
+              <StackBar key={s} stack={s} />
+            ))}
           </div>
-          <div className="flex flex-col gap-3">
+        </section>
+
+        {/* ── 4. WORK ──────────────────────────────────────── */}
+        <section
+          id="work"
+          data-sec="work"
+          style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
+        >
+          <SectionHeader num="03" title="Work" />
+          <div
+            data-reveal
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "22px 0",
+              borderTop: "1px solid var(--line)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <div
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "11px",
+                  background: "var(--bg2)",
+                  border: "1px solid var(--line)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "var(--accent)",
+                  flexShrink: 0,
+                }}
+              >
+                <Briefcase size={18} />
+              </div>
+              <div>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "16px",
+                    fontWeight: 600,
+                    color: "var(--ink)",
+                    marginBottom: "3px",
+                  }}
+                >
+                  Junior Web Developer Intern
+                </p>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "13px",
+                    color: "var(--muted-text)",
+                  }}
+                >
+                  Circuit Solutions Inc.
+                </p>
+              </div>
+            </div>
+            <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "16px" }}>
+              <p
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "11.5px",
+                  color: "var(--faint)",
+                  marginBottom: "6px",
+                }}
+              >
+                Mar 2026 — Jun 2026
+              </p>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "6px" }}>
+                <span style={{ position: "relative", display: "inline-flex", width: "7px", height: "7px" }}>
+                  <span
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      borderRadius: "50%",
+                      background: "oklch(0.7 0.17 150)",
+                      animation: "ping-avail 1.4s cubic-bezier(0,0,0.2,1) infinite",
+                    }}
+                  />
+                  <span
+                    style={{
+                      position: "relative",
+                      display: "inline-flex",
+                      width: "7px",
+                      height: "7px",
+                      borderRadius: "50%",
+                      background: "oklch(0.62 0.18 150)",
+                    }}
+                  />
+                </span>
+                <span
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    color: "oklch(0.55 0.16 150)",
+                  }}
+                >
+                  Current
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5. PROJECTS ──────────────────────────────────── */}
+        <section
+          id="projects"
+          data-sec="projects"
+          style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
+        >
+          <SectionHeader num="04" title="Projects" />
+          <div data-reveal>
             <ProjectCard
               title="WikaWonders Kids"
-              description="An interactive educational platform helping Filipino children learn language through engaging games and activities."
-              imageUrl="/cover_banner.svg"
+              description="An interactive learning platform helping Filipino children pick up language through playful games and activities — built to be engaging, accessible, and genuinely fun."
+              imageUrl="/assets/cover_banner.svg"
               siteUrl="https://wikawonderskids.com"
               githubUrl="https://github.com/kinitsZ/wikawonders-kids-2025"
+              tag="Educational Platform"
             />
           </div>
-        </div>
+        </section>
 
-        <hr className="border-t-2 border-[#e0e0e0] mt-7" />
-
-        {/* EDUCATION section */}
-        <div className="mt-7">
-          <div className="flex items-center gap-2 mb-3">
-            <GraduationCap size={16} className="text-[#b0b0b0]" />
-            <h2 className="text-xl font-bold text-[#4E4E4E]">Education</h2>
-          </div>
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <Image
-                src="/Seal_of_Lyceum_of_the_Philippines_University.svg"
-                alt="LPU Logo"
-                width={40}
-                height={40}
-                className="shrink-0"
-              />
-              <div className="flex flex-col gap-0.5">
-                <p className="text-sm font-medium text-[#4E4E4E]">BS Computer Science — Data Science</p>
-                <p className="text-xs text-[#ababab]">Lyceum of the Philippines University – Batangas</p>
+        {/* ── 6. EDUCATION ─────────────────────────────────── */}
+        <section
+          id="education"
+          data-sec="education"
+          style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
+        >
+          <SectionHeader num="05" title="Education" />
+          <div
+            data-reveal
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "22px 0",
+              borderTop: "1px solid var(--line)",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              <div
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  borderRadius: "11px",
+                  background: "var(--bg2)",
+                  border: "1px solid var(--line)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "var(--accent)",
+                  flexShrink: 0,
+                }}
+              >
+                <GraduationCap size={18} />
+              </div>
+              <div>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "16px",
+                    fontWeight: 600,
+                    color: "var(--ink)",
+                    marginBottom: "3px",
+                  }}
+                >
+                  BS Computer Science — Data Science
+                </p>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: "13px",
+                    color: "var(--muted-text)",
+                  }}
+                >
+                  Lyceum of the Philippines University — Batangas
+                </p>
               </div>
             </div>
-            <div className="shrink-0 ml-4 text-right">
-              <p className="text-xs text-[#c8c8c8]">2022 – Aug 2026</p>
-              <p className="text-xs text-[#c8c8c8] mt-0.5">Expected graduation</p>
+            <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "16px" }}>
+              <p
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "11.5px",
+                  color: "var(--faint)",
+                  marginBottom: "4px",
+                }}
+              >
+                2022 — Aug 2026
+              </p>
+              <p
+                style={{
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "12px",
+                  color: "var(--faint)",
+                }}
+              >
+                Expected graduation
+              </p>
             </div>
           </div>
-        </div>
+        </section>
 
-        <hr className="border-t-2 border-[#e0e0e0] mt-7" />
-
-        {/* AWARDS section */}
-        <div className="mt-7">
-          <div className="flex items-center gap-2 mb-4">
-            <Trophy size={16} className="text-[#b0b0b0]" />
-            <h2 className="text-xl font-bold text-[#4E4E4E]">Awards</h2>
+        {/* ── 7. AWARDS ────────────────────────────────────── */}
+        <section
+          id="awards"
+          data-sec="awards"
+          style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
+        >
+          <SectionHeader num="06" title="Awards" />
+          <div data-reveal>
+            <AwardsTimeline />
           </div>
-          <AwardsTimeline />
-        </div>
+        </section>
 
-        <hr className="border-t-2 border-[#e0e0e0] mt-7" />
-
-        {/* LICENSES & CERTIFICATIONS section */}
-        <div className="mt-7">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <BadgeCheck size={16} className="text-[#b0b0b0]" />
-              <h2 className="text-xl font-bold text-[#4E4E4E]">Licenses & Certifications</h2>
-            </div>
-            <CertAllModal />
+        {/* ── 8. CERTIFICATIONS ────────────────────────────── */}
+        <section
+          id="certs"
+          data-sec="certs"
+          style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
+        >
+          <SectionHeader num="07" title="Certifications" />
+          <div>
+            {CERT_LIST.map((cert, i) => (
+              <CertRow key={cert} index={i + 1} title={cert} />
+            ))}
           </div>
-          <CertCarousel />
-        </div>
-
-        <hr className="border-t-2 border-[#e0e0e0] mt-7" />
-
-        {/* CONTACT section */}
-        <div className="mt-7 mb-20">
-          <div className="flex items-center gap-2 mb-4">
-            <Mail size={16} className="text-[#b0b0b0]" />
-            <h2 className="text-xl font-bold text-[#4E4E4E]">Contact</h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Email */}
-            <a href="mailto:fernandozymer@gmail.com" className="flex items-center gap-3 p-3 rounded-xl bg-[#f9f9f9] hover:bg-[#f2f2f2] transition-colors group">
-              <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
-                <Mail size={14} className="text-[#9a9a9a]" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] text-[#c0c0c0]">Email</p>
-                <p className="text-xs font-medium text-[#4E4E4E] group-hover:text-[#2a2a2a] transition-colors truncate">fernandozymer@gmail.com</p>
-              </div>
-            </a>
-
-            {/* Phone */}
-            <a href="tel:+639693695916" className="flex items-center gap-3 p-3 rounded-xl bg-[#f9f9f9] hover:bg-[#f2f2f2] transition-colors group">
-              <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
-                <Phone size={14} className="text-[#9a9a9a]" />
-              </div>
-              <div>
-                <p className="text-[10px] text-[#c0c0c0]">Phone</p>
-                <p className="text-xs font-medium text-[#4E4E4E] group-hover:text-[#2a2a2a] transition-colors">+63 969 369 5916</p>
-              </div>
-            </a>
-
-            {/* LinkedIn */}
-            <a href="https://www.linkedin.com/in/zymer-fernando-24baa5259/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-[#f9f9f9] hover:bg-[#f2f2f2] transition-colors group">
-              <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-[#9a9a9a]"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-              </div>
-              <div>
-                <p className="text-[10px] text-[#c0c0c0]">LinkedIn</p>
-                <p className="text-xs font-medium text-[#4E4E4E] group-hover:text-[#2a2a2a] transition-colors">zymer-fernando</p>
-              </div>
-            </a>
-
-            {/* GitHub */}
-            <a href="https://github.com/kinitsZ" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-[#f9f9f9] hover:bg-[#f2f2f2] transition-colors group">
-              <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-[#9a9a9a]"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-              </div>
-              <div>
-                <p className="text-[10px] text-[#c0c0c0]">GitHub</p>
-                <p className="text-xs font-medium text-[#4E4E4E] group-hover:text-[#2a2a2a] transition-colors">kinitsZ</p>
-              </div>
-            </a>
-
-            {/* Facebook */}
-            <a href="https://www.facebook.com/zymer.fernando.2024" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl bg-[#f9f9f9] hover:bg-[#f2f2f2] transition-colors group">
-              <div className="w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center shrink-0">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-[#9a9a9a]"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-              </div>
-              <div>
-                <p className="text-[10px] text-[#c0c0c0]">Facebook</p>
-                <p className="text-xs font-medium text-[#4E4E4E] group-hover:text-[#2a2a2a] transition-colors">zymer.fernando.2024</p>
-              </div>
-            </a>
-
-            {/* Download CV */}
-            <a
-              href="/FERNANDOZYMER_RESUME.pdf"
-              download
-              className="flex items-center gap-3 p-3 rounded-xl bg-[#4E4E4E] hover:bg-[#3a3a3a] transition-colors group"
-            >
-              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                <Download size={14} className="text-white" />
-              </div>
-              <div>
-                <p className="text-[10px] text-white/50">Resume</p>
-                <p className="text-xs font-medium text-white">Download CV</p>
-              </div>
-            </a>
-          </div>
-        </div>
-
+        </section>
       </div>
 
-      {/* FOOTER */}
-      <footer className="mt-0 border-t border-[#ebebeb]">
-        <div className="max-w-2xl mx-auto px-4 sm:px-2 py-8 flex flex-col items-center gap-3">
-          <p className="text-[11px] text-[#c8c8c8] tracking-widest uppercase">Zymer Fernando</p>
-          <p className="text-[10px] text-[#d8d8d8]">
-            © {new Date().getFullYear()} · Built with Next.js & Tailwind CSS · Deployed on Vercel
+      {/* ── 9. PULL-QUOTE BAND ──────────────────────────────── */}
+      <div
+        data-reveal
+        style={{
+          position: "relative",
+          left: "50%",
+          width: "100vw",
+          marginLeft: "-50vw",
+          background: "var(--band-bg)",
+          padding: "128px 28px",
+          marginTop: "0",
+          marginBottom: "0",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1000px",
+            margin: "0 auto",
+            textAlign: "center",
+            position: "relative",
+          }}
+        >
+          {/* Faded quote mark */}
+          <span
+            aria-hidden
+            style={{
+              position: "absolute",
+              top: "-40px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              fontFamily: "var(--font-serif)",
+              fontSize: "120px",
+              lineHeight: 1,
+              color: "var(--accent)",
+              opacity: 0.22,
+              userSelect: "none",
+            }}
+          >
+            &ldquo;
+          </span>
+
+          <p
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
+              letterSpacing: "0.26em",
+              color: "var(--accent)",
+              textTransform: "uppercase",
+              marginBottom: "24px",
+            }}
+          >
+            The Goal
           </p>
-          <div className="flex gap-4 mt-1">
-            <a href="https://www.linkedin.com/in/zymer-fernando-24baa5259/" target="_blank" rel="noopener noreferrer" className="text-[#d0d0d0] hover:text-[#4E4E4E] transition-colors">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-            </a>
-            <a href="https://github.com/kinitsZ" target="_blank" rel="noopener noreferrer" className="text-[#d0d0d0] hover:text-[#4E4E4E] transition-colors">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-            </a>
-            <a href="https://www.facebook.com/zymer.fernando.2024" target="_blank" rel="noopener noreferrer" className="text-[#d0d0d0] hover:text-[#4E4E4E] transition-colors">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-            </a>
-            <a href="mailto:fernandozymer@gmail.com" className="text-[#d0d0d0] hover:text-[#4E4E4E] transition-colors">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-            </a>
+
+          <blockquote
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontSize: "clamp(30px, 5.4vw, 62px)",
+              lineHeight: 1.1,
+              maxWidth: "18ch",
+              margin: "0 auto 28px",
+              color: "var(--ink)",
+            }}
+          >
+            &ldquo;I want to build the systems a{" "}
+            <em style={{ color: "var(--accent)", fontStyle: "italic" }}>
+              million people
+            </em>{" "}
+            rely on — without ever thinking about them.&rdquo;
+          </blockquote>
+
+          <p
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "10.5px",
+              letterSpacing: "0.14em",
+              color: "var(--faint)",
+              textTransform: "uppercase",
+            }}
+          >
+            — Zymer Fernando, the principle I code by
+          </p>
+        </div>
+      </div>
+
+      {/* ── 10. CONTACT ─────────────────────────────────────── */}
+      <div
+        style={{
+          maxWidth: "920px",
+          margin: "0 auto",
+          padding: "0 28px",
+        }}
+        className="md:pl-28"
+      >
+        <section
+          id="contact"
+          data-sec="contact"
+          style={{
+            scrollMarginTop: "48px",
+            paddingTop: "64px",
+            paddingBottom: "64px",
+          }}
+        >
+          <SectionHeader num="08" title="Contact" />
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gap: "12px",
+            }}
+            className="grid-cols-1! md:grid-cols-2!"
+          >
+            <ContactCard
+              href="mailto:fernandozymer@gmail.com"
+              icon={<Mail size={16} />}
+              label="Email"
+              value="fernandozymer@gmail.com"
+            />
+            <ContactCard
+              href="tel:+639693695916"
+              icon={<Phone size={16} />}
+              label="Phone"
+              value="+63 969 369 5916"
+            />
+            <ContactCard
+              href="https://www.linkedin.com/in/zymer-fernando-24baa5259/"
+              icon={
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                  <rect x="2" y="9" width="4" height="12" />
+                  <circle cx="4" cy="4" r="2" />
+                </svg>
+              }
+              label="LinkedIn"
+              value="zymer-fernando"
+            />
+            <ContactCard
+              href="https://github.com/kinitsZ"
+              icon={
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+                </svg>
+              }
+              label="GitHub"
+              value="kinitsZ"
+            />
+            <ContactCard
+              href="https://www.facebook.com/zymer.fernando.2024"
+              icon={
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+              }
+              label="Facebook"
+              value="zymer.fernando.2024"
+            />
+            <ContactCard
+              href="/FERNANDOZYMER_RESUME.pdf"
+              icon={<Download size={16} />}
+              label="Resume"
+              value="Download CV"
+              filled
+            />
+          </div>
+        </section>
+      </div>
+
+      {/* ── FOOTER ──────────────────────────────────────────── */}
+      <footer
+        style={{
+          borderTop: "1px solid var(--line)",
+          paddingTop: "40px",
+          paddingBottom: "40px",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "920px",
+            margin: "0 auto",
+            padding: "0 28px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "10px",
+          }}
+          className="md:pl-28"
+        >
+          <p
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "11px",
+              letterSpacing: "0.28em",
+              color: "var(--muted-text)",
+              textTransform: "uppercase",
+            }}
+          >
+            Zymer Fernando
+          </p>
+          <p
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "10px",
+              color: "var(--faint)",
+              letterSpacing: "0.08em",
+            }}
+          >
+            © {new Date().getFullYear()} · Designed & built with intent · Batangas, Philippines
+          </p>
+          <div style={{ display: "flex", gap: "16px", marginTop: "4px" }}>
+            <SocialIcon href="https://www.linkedin.com/in/zymer-fernando-24baa5259/" label="LinkedIn">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                <rect x="2" y="9" width="4" height="12" />
+                <circle cx="4" cy="4" r="2" />
+              </svg>
+            </SocialIcon>
+            <SocialIcon href="https://github.com/kinitsZ" label="GitHub">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+              </svg>
+            </SocialIcon>
+            <SocialIcon href="https://www.facebook.com/zymer.fernando.2024" label="Facebook">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+              </svg>
+            </SocialIcon>
           </div>
         </div>
       </footer>
+    </>
+  );
+}
 
+/* ── Small helpers ──────────────────────────────────────── */
+
+function SocialIcon({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      style={{
+        color: "var(--faint)",
+        transition: "color 0.2s ease, transform 0.2s ease",
+        display: "inline-flex",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.color = "var(--accent)";
+        e.currentTarget.style.transform = "translateY(-2px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.color = "var(--faint)";
+        e.currentTarget.style.transform = "translateY(0)";
+      }}
+    >
+      {children}
+    </a>
+  );
+}
+
+function CertRow({ index, title }: { index: number; title: string }) {
+  return (
+    <div
+      data-reveal
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "14px 0",
+        borderTop: "1px solid var(--line)",
+        transition: "padding-left 0.3s ease",
+        gap: "16px",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.paddingLeft = "8px")}
+      onMouseLeave={(e) => (e.currentTarget.style.paddingLeft = "0px")}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <span
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "11.5px",
+            color: "var(--accent)",
+            letterSpacing: "0.12em",
+            flexShrink: 0,
+          }}
+        >
+          {String(index).padStart(2, "0")}
+        </span>
+        <span
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "15.5px",
+            fontWeight: 500,
+            color: "var(--ink)",
+          }}
+        >
+          {title}
+        </span>
+      </div>
+      <span
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: "10px",
+          letterSpacing: "0.14em",
+          color: "var(--faint)",
+          textTransform: "uppercase",
+          flexShrink: 0,
+        }}
+      >
+        Certified
+      </span>
     </div>
   );
 }

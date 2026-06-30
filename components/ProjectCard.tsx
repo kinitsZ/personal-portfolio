@@ -1,87 +1,153 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
+import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
 
 type ProjectCardProps = {
-  title: string
-  description: string
-  imageUrl?: string
-  siteUrl?: string
-  githubUrl?: string
-  slug?: string
-}
+  title: string;
+  description: string;
+  imageUrl?: string;
+  siteUrl?: string;
+  githubUrl?: string;
+  tag?: string;
+};
 
-const ProjectCard = ({ title, description, imageUrl, siteUrl, githubUrl }: ProjectCardProps) => {
+const ProjectCard = ({
+  title,
+  description,
+  imageUrl,
+  siteUrl,
+  githubUrl,
+  tag,
+}: ProjectCardProps) => {
   return (
-    <div className="group relative w-full cursor-pointer rounded-2xl overflow-hidden h-[310px] ring-1 ring-black/6 group-hover:ring-black/10 transition-all duration-700">
-
-      {/* Image */}
-      <div className="absolute inset-0 grayscale-40 group-hover:grayscale-0 group-hover:filter-none transition-all duration-700">
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "200px 1fr",
+        borderRadius: "18px",
+        background: "var(--bg2)",
+        border: "1px solid var(--line)",
+        overflow: "hidden",
+        transition: "transform 0.25s ease, box-shadow 0.25s ease",
+      }}
+      className="grid-cols-1! md:grid-cols-[200px_1fr]!"
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.boxShadow = "var(--shadow)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "none";
+      }}
+    >
+      {/* Image panel */}
+      <div
+        style={{
+          background: "var(--bg)",
+          borderRight: "1px solid var(--line)",
+          position: "relative",
+          minHeight: "180px",
+        }}
+        className="border-right-0! md:border-r-(--line)! border-b border-b-(--line) md:border-b-0!"
+      >
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={title}
             fill
-            className="object-cover scale-100 group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+            style={{ objectFit: "contain", padding: "20px" }}
           />
         ) : (
-          <div className="w-full h-full bg-linear-to-br from-[#8a8a8a] to-[#3a3a3a]" />
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "linear-gradient(135deg, var(--bg2), var(--line))",
+            }}
+          />
         )}
       </div>
 
-      {/* Always-on bottom vignette so text is readable */}
-      <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/0 to-transparent" />
-
-      {/* Hover overlay — strengthens the vignette */}
-      <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-      {/* Links — top right on hover */}
-      <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 -translate-y-1.5 group-hover:translate-y-0 transition-all duration-500">
-        {siteUrl && (
-          <a
-            href={siteUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1 text-[11px] font-medium text-white/90 bg-white/10 hover:bg-white/25 backdrop-blur-md border border-white/20 rounded-full px-3 py-1 transition-colors"
-            style={{ fontFamily: 'var(--font-poppins)' }}
+      {/* Body */}
+      <div style={{ padding: "28px 32px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        {tag && (
+          <p
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "10.5px",
+              letterSpacing: "0.16em",
+              color: "var(--faint)",
+              textTransform: "uppercase",
+              marginBottom: "10px",
+            }}
           >
-            ↗ Visit site
-          </a>
+            {tag}
+          </p>
         )}
-        {githubUrl && (
-          <a
-            href={githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1.5 text-[11px] font-medium text-white/90 bg-white/10 hover:bg-white/25 backdrop-blur-md border border-white/20 rounded-full px-3 py-1 transition-colors"
-            style={{ fontFamily: 'var(--font-poppins)' }}
-          >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-            GitHub
-          </a>
-        )}
-      </div>
 
-      {/* Title always visible at bottom, description slides up on hover */}
-      <div className="absolute bottom-0 left-0 right-0 p-6">
-        <p
-          className="text-white text-base font-semibold leading-tight tracking-tight"
-          style={{ fontFamily: 'var(--font-poppins)' }}
+        <h3
+          style={{
+            fontFamily: "var(--font-serif)",
+            fontSize: "22px",
+            color: "var(--ink)",
+            lineHeight: 1.15,
+            marginBottom: "12px",
+          }}
         >
           {title}
-        </p>
+        </h3>
+
         <p
-          className="text-white/0 group-hover:text-white/65 text-[12px] leading-relaxed mt-1.5 max-w-md overflow-hidden max-h-0 group-hover:max-h-20 transition-all duration-500"
-          style={{ fontFamily: 'var(--font-poppins)' }}
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: "14px",
+            lineHeight: 1.6,
+            color: "var(--muted-text)",
+            maxWidth: "54ch",
+            marginBottom: "20px",
+          }}
         >
           {description}
         </p>
-      </div>
 
+        <div style={{ display: "flex", gap: "20px" }}>
+          {siteUrl && (
+            <ProjectLink href={siteUrl} label="Live site" />
+          )}
+          {githubUrl && (
+            <ProjectLink href={githubUrl} label="Source" />
+          )}
+        </div>
+      </div>
     </div>
-  )
+  );
+};
+
+function ProjectLink({ href, label }: { href: string; label: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "4px",
+        fontFamily: "var(--font-sans)",
+        fontSize: "13px",
+        fontWeight: 500,
+        color: "var(--muted-text)",
+        textDecoration: "underline",
+        textUnderlineOffset: "3px",
+        transition: "color 0.2s ease",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
+      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-text)")}
+    >
+      {label} <ArrowUpRight size={13} />
+    </a>
+  );
 }
 
-export default ProjectCard
+export default ProjectCard;
