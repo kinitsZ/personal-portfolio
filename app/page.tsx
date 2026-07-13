@@ -984,10 +984,11 @@ export default function Home() {
               marginBottom: "24px",
             }}
           >
-            The Goal
+            The Principle
           </p>
 
           <blockquote
+            cite="https://www.cs.utexas.edu/~EWD/transcriptions/EWD04xx/EWD498.html"
             style={{
               fontFamily: "var(--font-serif)",
               fontSize: "clamp(30px, 5.4vw, 62px)",
@@ -997,11 +998,11 @@ export default function Home() {
               color: "var(--ink)",
             }}
           >
-            &ldquo;I want to build the systems a{" "}
+            &ldquo;Simplicity is a prerequisite for{" "}
             <em style={{ color: "var(--accent)", fontStyle: "italic" }}>
-              million people
-            </em>{" "}
-            rely on — without ever thinking about them.&rdquo;
+              reliability
+            </em>
+            .&rdquo;
           </blockquote>
 
           <p
@@ -1013,7 +1014,7 @@ export default function Home() {
               textTransform: "uppercase",
             }}
           >
-            — Zymer Fernando, the principle I code by
+            — Edsger W. Dijkstra
           </p>
         </div>
       </div>
