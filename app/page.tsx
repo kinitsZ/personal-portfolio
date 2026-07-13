@@ -164,7 +164,7 @@ export default function Home() {
         >
           <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-10 md:gap-12 items-center">
             {/* Left — children reveal individually so the hero cascades in */}
-            <div className="order-2 md:order-1">
+            <div>
               {/* Kicker */}
               <p
                 data-reveal
