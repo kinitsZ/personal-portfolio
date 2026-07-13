@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, Menu, X } from "lucide-react";
 import Image from "next/image";
 
 const SECTIONS = [
@@ -21,6 +21,7 @@ export default function NavBar() {
   const { resolvedTheme, setTheme } = useTheme();
   const [active, setActive] = useState("top");
   const [mounted, setMounted] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -47,8 +48,10 @@ export default function NavBar() {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
 
   return (
+    <>
     <nav
       aria-label="Page navigation"
+      className={open ? "rail rail-open" : "rail"}
       style={{
         position: "fixed",
         left: "22px",
@@ -71,6 +74,7 @@ export default function NavBar() {
       {/* Avatar */}
       <a
         href="#top"
+        className="rail-avatar"
         style={{
           display: "block",
           width: "34px",
@@ -88,12 +92,25 @@ export default function NavBar() {
           alt="Zymer Fernando"
           width={34}
           height={34}
-          style={{ objectFit: "cover", objectPosition: "50% 18%", width: "100%", height: "100%" }}
+          style={{
+            objectFit: "cover",
+            objectPosition: "50% 18%",
+            width: "100%",
+            height: "100%",
+          }}
         />
       </a>
 
       {/* Divider */}
-      <div style={{ width: "1px", height: "18px", background: "var(--line)", margin: "2px 0" }} />
+      <div
+        className="rail-div"
+        style={{
+          width: "1px",
+          height: "18px",
+          background: "var(--line)",
+          margin: "2px 0",
+        }}
+      />
 
       {/* Section dots */}
       {SECTIONS.map(({ id, label }) => {
@@ -103,6 +120,9 @@ export default function NavBar() {
             key={id}
             href={`#${id}`}
             aria-label={label}
+            aria-current={isActive ? "true" : undefined}
+            onClick={() => setOpen(false)}
+            className="group/dot rail-hit"
             style={{
               position: "relative",
               display: "flex",
@@ -112,10 +132,10 @@ export default function NavBar() {
               height: "24px",
               flexShrink: 0,
             }}
-            className="group/dot"
           >
             {/* Dot */}
             <span
+              className="group-hover/dot:bg-accent!"
               style={{
                 display: "block",
                 width: "7px",
@@ -125,11 +145,11 @@ export default function NavBar() {
                 transform: isActive ? "scale(1.55)" : "scale(1)",
                 transition: "background 0.2s ease, transform 0.2s ease",
               }}
-              className="group-hover/dot:bg-accent!"
             />
 
             {/* Hover label */}
             <span
+              className="rail-label group-hover/dot:opacity-100! group-hover/dot:translate-x-0!"
               style={{
                 position: "absolute",
                 left: "calc(100% + 10px)",
@@ -147,7 +167,6 @@ export default function NavBar() {
                 transform: "translateX(-5px)",
                 transition: "opacity 0.18s ease, transform 0.18s ease",
               }}
-              className="group-hover/dot:opacity-100! group-hover/dot:translate-x-0!"
             >
               {label}
             </span>
@@ -156,12 +175,21 @@ export default function NavBar() {
       })}
 
       {/* Divider */}
-      <div style={{ width: "1px", height: "18px", background: "var(--line)", margin: "2px 0" }} />
+      <div
+        className="rail-div"
+        style={{
+          width: "1px",
+          height: "18px",
+          background: "var(--line)",
+          margin: "2px 0",
+        }}
+      />
 
       {/* Theme toggle */}
       <button
         onClick={toggleTheme}
         aria-label="Toggle theme"
+        className="rail-toggle"
         style={{
           width: "30px",
           height: "30px",
@@ -185,12 +213,19 @@ export default function NavBar() {
           e.currentTarget.style.color = "var(--faint)";
         }}
       >
-        {mounted && resolvedTheme === "dark" ? (
-          <Sun size={13} />
-        ) : (
-          <Moon size={13} />
-        )}
+        {mounted && resolvedTheme === "dark" ? <Sun size={13} /> : <Moon size={13} />}
       </button>
     </nav>
+
+    {/* Mobile open/close button. Hidden on desktop via CSS. */}
+    <button
+      className="rail-fab"
+      onClick={() => setOpen((v) => !v)}
+      aria-label={open ? "Close navigation" : "Open navigation"}
+      aria-expanded={open}
+    >
+      {open ? <X size={18} /> : <Menu size={18} />}
+    </button>
+    </>
   );
 }

@@ -38,7 +38,13 @@ const AwardsTimeline = () => {
 
       <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
         {awards.map((award, i) => (
-          <div key={i} style={{ position: "relative" }} className="group/award">
+          <div
+            key={i}
+            data-reveal
+            data-reveal-delay={i * 90}
+            style={{ position: "relative" }}
+            className="group/award"
+          >
             {/* Dot */}
             <div
               style={{
@@ -55,14 +61,7 @@ const AwardsTimeline = () => {
               className="group-hover/award:border-accent!"
             />
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-start",
-                justifyContent: "space-between",
-                gap: "16px",
-              }}
-            >
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-4">
               <div>
                 <p
                   style={{

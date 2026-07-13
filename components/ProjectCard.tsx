@@ -23,15 +23,13 @@ const ProjectCard = ({
   return (
     <div
       style={{
-        display: "grid",
-        gridTemplateColumns: "200px 1fr",
         borderRadius: "18px",
         background: "var(--bg2)",
         border: "1px solid var(--line)",
         overflow: "hidden",
         transition: "transform 0.25s ease, box-shadow 0.25s ease",
       }}
-      className="grid-cols-1! md:grid-cols-[200px_1fr]!"
+      className="grid grid-cols-1 sm:grid-cols-[200px_1fr]"
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = "translateY(-4px)";
         e.currentTarget.style.boxShadow = "var(--shadow)";
@@ -41,21 +39,21 @@ const ProjectCard = ({
         e.currentTarget.style.boxShadow = "none";
       }}
     >
-      {/* Image panel */}
+      {/* Image panel — divider sits below when stacked, right when side-by-side */}
       <div
         style={{
           background: "var(--bg)",
-          borderRight: "1px solid var(--line)",
           position: "relative",
           minHeight: "180px",
         }}
-        className="border-right-0! md:border-r-(--line)! border-b border-b-(--line) md:border-b-0!"
+        className="border-b border-(--line) sm:border-b-0 sm:border-r"
       >
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={title}
             fill
+            sizes="(max-width: 640px) 100vw, 200px"
             style={{ objectFit: "contain", padding: "20px" }}
           />
         ) : (
@@ -70,7 +68,10 @@ const ProjectCard = ({
       </div>
 
       {/* Body */}
-      <div style={{ padding: "28px 32px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+      <div
+        className="p-6 sm:px-8 sm:py-7"
+        style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}
+      >
         {tag && (
           <p
             style={{

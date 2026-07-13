@@ -6,12 +6,13 @@ import AwardsTimeline from "@/components/AwardsTimeline";
 import ProjectCard from "@/components/ProjectCard";
 import StackBar from "@/components/StackBar";
 import RevealObserver from "@/components/RevealObserver";
+import CertGallery from "@/components/CertGallery";
 
 /* ── Reusable sub-components ────────────────────────────── */
 
 function SectionHeader({ num, title }: { num: string; title: string }) {
   return (
-    <div className="flex items-center gap-4 mb-10">
+    <div data-reveal className="flex items-center gap-4 mb-10">
       <span
         style={{
           fontFamily: "var(--font-mono)",
@@ -36,6 +37,7 @@ function SectionHeader({ num, title }: { num: string; title: string }) {
         {title}
       </h2>
       <div
+        className="rule-line"
         style={{ height: "1px", background: "var(--line)", flex: 1 }}
       />
     </div>
@@ -67,8 +69,8 @@ function ContactCard({
         gap: "14px",
         padding: "16px 18px",
         borderRadius: "14px",
-        background: filled ? "var(--ink)" : "var(--bg2)",
-        border: `1px solid ${filled ? "var(--ink)" : "var(--line)"}`,
+        background: filled ? "var(--cta-bg)" : "var(--bg2)",
+        border: `1px solid ${filled ? "var(--cta-bg)" : "var(--line)"}`,
         transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease",
         textDecoration: "none",
       }}
@@ -88,12 +90,12 @@ function ContactCard({
           width: "38px",
           height: "38px",
           borderRadius: "10px",
-          background: filled ? "rgba(255,255,255,0.12)" : "var(--bg)",
+          background: filled ? "var(--cta-tile)" : "var(--bg)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           flexShrink: 0,
-          color: filled ? "white" : "var(--accent)",
+          color: filled ? "var(--cta-fg)" : "var(--accent)",
         }}
       >
         {icon}
@@ -104,7 +106,7 @@ function ContactCard({
             fontFamily: "var(--font-mono)",
             fontSize: "10px",
             letterSpacing: "0.14em",
-            color: filled ? "rgba(255,255,255,0.5)" : "var(--faint)",
+            color: filled ? "var(--cta-fg-dim)" : "var(--faint)",
             textTransform: "uppercase",
             marginBottom: "2px",
           }}
@@ -115,7 +117,7 @@ function ContactCard({
           style={{
             fontSize: "13px",
             fontWeight: 600,
-            color: filled ? "white" : "var(--ink)",
+            color: filled ? "var(--cta-fg)" : "var(--ink)",
             fontFamily: "var(--font-sans)",
           }}
         >
@@ -125,14 +127,6 @@ function ContactCard({
     </a>
   );
 }
-
-const CERT_LIST = [
-  "Data Visualization with Python",
-  "Introduction to Software Engineering",
-  "Introduction to HTML, CSS & JavaScript",
-  "Java Programming for Beginners",
-  "Excel Associate",
-];
 
 const STACK = [
   "Next.js",
@@ -159,26 +153,22 @@ export default function Home() {
     <>
       <RevealObserver />
 
-      {/* Page wrapper — left pad reserves the side rail on desktop */}
-      <div
-        style={{
-          maxWidth: "920px",
-          margin: "0 auto",
-          padding: "0 28px 0 28px",
-        }}
-        className="md:pl-28"
-      >
+      {/* Page wrapper — left pad reserves the side rail (compact on mobile) */}
+      <div className="mx-auto max-w-[920px] pl-5 pr-5 md:pl-7 md:pr-7">
         {/* ── 1. HERO ─────────────────────────────────────── */}
         <section
           id="top"
           data-sec="top"
-          style={{ scrollMarginTop: "48px", paddingTop: "120px", paddingBottom: "64px" }}
+          className="pt-20 pb-16 md:pt-[120px]"
+          style={{ scrollMarginTop: "48px" }}
         >
           <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-10 md:gap-12 items-center">
-            {/* Left */}
-            <div data-reveal className="order-2 md:order-1">
+            {/* Left — children reveal individually so the hero cascades in */}
+            <div className="order-2 md:order-1">
               {/* Kicker */}
               <p
+                data-reveal
+                data-reveal-delay="0"
                 style={{
                   fontFamily: "var(--font-mono)",
                   fontSize: "10.5px",
@@ -204,22 +194,59 @@ export default function Home() {
                 Full-Stack Developer · Data Science
               </p>
 
-              {/* Hero name */}
-              <h1
-                style={{
-                  fontFamily: "var(--font-serif)",
-                  lineHeight: 0.86,
-                  letterSpacing: "-0.01em",
-                  fontSize: "clamp(58px, 9.5vw, 128px)",
-                  marginBottom: "28px",
-                }}
+              {/* Hero name. On mobile a compact portrait fills the empty space to
+                  its right, stretched to the name's own height. The 28px bottom
+                  margin moves from the h1 to this row so spacing is unchanged. */}
+              <div
+                className="flex items-stretch gap-3 md:block"
+                style={{ marginBottom: "28px" }}
               >
-                <span style={{ color: "var(--ink)", display: "block" }}>Zymer</span>
-                <span style={{ color: "var(--faint)", display: "block" }}>Fernando</span>
-              </h1>
+                <h1
+                  data-reveal
+                  data-reveal-delay="90"
+                  className="min-w-0"
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    lineHeight: 0.86,
+                    letterSpacing: "-0.01em",
+                    fontSize: "clamp(58px, 9.5vw, 128px)",
+                  }}
+                >
+                  <span style={{ color: "var(--ink)", display: "block" }}>Zymer</span>
+                  <span style={{ color: "var(--faint)", display: "block" }}>Fernando</span>
+                </h1>
+
+                {/* Mobile-only; the full figure lives in the right column on desktop */}
+                <div
+                  data-reveal="fade"
+                  data-reveal-delay="150"
+                  className="relative ml-[30px] w-[92px] shrink-0 self-stretch md:hidden"
+                  style={{
+                    borderRadius: "10px",
+                    overflow: "hidden",
+                    border: "1px solid var(--line)",
+                    boxShadow: "var(--shadow)",
+                  }}
+                >
+                  <Image
+                    src="/assets/main_image.JPG"
+                    alt="Zymer Fernando"
+                    fill
+                    sizes="108px"
+                    priority
+                    style={{
+                      objectFit: "cover",
+                      objectPosition: "50% 35%",
+                      transform: "scale(1.20)",
+                    }}
+                  />
+                </div>
+              </div>
 
               {/* Lede */}
               <p
+                data-reveal
+                data-reveal-delay="180"
                 style={{
                   fontFamily: "var(--font-sans)",
                   fontSize: "clamp(17px, 1.9vw, 21px)",
@@ -239,6 +266,8 @@ export default function Home() {
 
               {/* Meta row */}
               <div
+                data-reveal
+                data-reveal-delay="260"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -305,7 +334,11 @@ export default function Home() {
               </div>
 
               {/* CTAs */}
-              <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "40px" }}>
+              <div
+                data-reveal
+                data-reveal-delay="340"
+                style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "40px" }}
+              >
                 <a
                   href="#contact"
                   style={{
@@ -367,7 +400,11 @@ export default function Home() {
               </div>
 
               {/* Scroll cue */}
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <div
+                data-reveal="fade"
+                data-reveal-delay="440"
+                style={{ display: "flex", alignItems: "center", gap: "12px" }}
+              >
                 <span
                   style={{
                     fontFamily: "var(--font-mono)",
@@ -402,10 +439,11 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right — hero portrait */}
+            {/* Right — full hero figure (desktop only) */}
             <div
-              data-reveal
-              className="order-1 md:order-2 max-w-[300px] mx-auto md:max-w-none"
+              data-reveal="fade"
+              data-reveal-delay="140"
+              className="hidden md:block w-full"
             >
               <div
                 style={{
@@ -417,10 +455,11 @@ export default function Home() {
                 }}
               >
                 <Image
-                  src="/assets/hero.jpg"
+                  src="/assets/main_image.JPG"
                   alt="Zymer Fernando"
                   width={480}
                   height={656}
+                  sizes="(max-width: 768px) 300px, 320px"
                   priority
                   style={{
                     width: "100%",
@@ -440,7 +479,7 @@ export default function Home() {
                       "linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 55%)",
                   }}
                 />
-                {/* Tag top-left */}
+                {/* Tag top-left. Sits on a photo, so it stays light in both themes. */}
                 <div
                   style={{
                     position: "absolute",
@@ -448,12 +487,14 @@ export default function Home() {
                     left: "14px",
                     padding: "4px 10px",
                     borderRadius: "999px",
-                    background: "rgba(0,0,0,0.35)",
+                    background: "rgba(0,0,0,0.5)",
+                    border: "1px solid rgba(255,255,255,0.14)",
                     backdropFilter: "blur(6px)",
+                    WebkitBackdropFilter: "blur(6px)",
                     fontFamily: "var(--font-mono)",
                     fontSize: "10px",
                     letterSpacing: "0.14em",
-                    color: "var(--accent)",
+                    color: "oklch(0.86 0.08 256)",
                     textTransform: "uppercase",
                   }}
                 >
@@ -517,8 +558,8 @@ export default function Home() {
                 </span>
               </p>
 
-              {/* Fact row */}
-              <div style={{ display: "flex", gap: "34px", flexWrap: "wrap" }}>
+              {/* Fact row — 3-up on every size; it wrapped awkwardly as a flex row */}
+              <div className="grid grid-cols-3 gap-3 sm:flex sm:gap-[34px]">
                 {[
                   { num: "3+", label: "Years Building" },
                   { num: "10+", label: "Projects & Comps" },
@@ -526,9 +567,9 @@ export default function Home() {
                 ].map(({ num, label }) => (
                   <div key={label}>
                     <p
+                      className="text-[22px] sm:text-[30px]"
                       style={{
                         fontFamily: "var(--font-serif)",
-                        fontSize: "30px",
                         color: "var(--ink)",
                         lineHeight: 1,
                         marginBottom: "4px",
@@ -537,12 +578,12 @@ export default function Home() {
                       {num}
                     </p>
                     <p
+                      className="text-[8.5px] tracking-[0.1em] sm:text-[10.5px] sm:tracking-[0.14em]"
                       style={{
                         fontFamily: "var(--font-mono)",
-                        fontSize: "10.5px",
-                        letterSpacing: "0.14em",
                         color: "var(--faint)",
                         textTransform: "uppercase",
+                        lineHeight: 1.35,
                       }}
                     >
                       {label}
@@ -560,22 +601,94 @@ export default function Home() {
                   overflow: "hidden",
                   border: "1px solid var(--line)",
                   boxShadow: "var(--shadow)",
+                  background: "var(--bg2)",
+                  padding: "22px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "18px",
                 }}
               >
-                <Image
-                  src="/assets/portrait.jpg"
-                  alt="Zymer Fernando seated"
-                  width={480}
-                  height={560}
-                  sizes="(max-width: 768px) 300px, 360px"
+                <p
                   style={{
-                    width: "100%",
-                    height: "auto",
-                    objectFit: "cover",
-                    objectPosition: "50% 16%",
-                    display: "block",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "10px",
+                    letterSpacing: "0.22em",
+                    color: "var(--faint)",
+                    textTransform: "uppercase",
                   }}
-                />
+                >
+                  Signal / Noise
+                </p>
+
+                <svg
+                  viewBox="0 0 200 150"
+                  role="img"
+                  aria-label="Abstract plotted curve rising through a grid"
+                  style={{ width: "100%", height: "auto", display: "block" }}
+                >
+                  {/* Grid */}
+                  {[30, 60, 90, 120].map((y) => (
+                    <line
+                      key={`h${y}`}
+                      x1="0"
+                      y1={y}
+                      x2="200"
+                      y2={y}
+                      stroke="var(--line)"
+                      strokeWidth="1"
+                    />
+                  ))}
+                  {[50, 100, 150].map((x) => (
+                    <line
+                      key={`v${x}`}
+                      x1={x}
+                      y1="0"
+                      x2={x}
+                      y2="150"
+                      stroke="var(--line)"
+                      strokeWidth="1"
+                    />
+                  ))}
+
+                  {/* Noise — the scattered path */}
+                  <path
+                    d="M0 132 L20 118 L40 126 L60 96 L80 108 L100 74 L120 86 L140 52 L160 62 L180 34 L200 42"
+                    fill="none"
+                    stroke="var(--faint)"
+                    strokeWidth="1.5"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    opacity="0.5"
+                  />
+
+                  {/* Signal — the smooth trend */}
+                  <path
+                    d="M0 128 C 50 116, 70 92, 100 78 S 160 44, 200 26"
+                    fill="none"
+                    stroke="var(--accent)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+
+                  {/* Endpoint */}
+                  <circle cx="200" cy="26" r="4" fill="var(--accent)" />
+                  <circle cx="200" cy="26" r="8" fill="var(--accent)" opacity="0.18" />
+                </svg>
+
+                <p
+                  style={{
+                    fontFamily: "var(--font-serif)",
+                    fontSize: "17px",
+                    lineHeight: 1.4,
+                    color: "var(--ink)",
+                  }}
+                >
+                  Finding the{" "}
+                  <em style={{ color: "var(--accent)", fontStyle: "italic" }}>
+                    signal
+                  </em>{" "}
+                  in the noise.
+                </p>
               </div>
             </div>
           </div>
@@ -588,9 +701,11 @@ export default function Home() {
           style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
         >
           <SectionHeader num="02" title="Tech Stack" />
-          <div data-reveal style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-            {STACK.map((s) => (
-              <StackBar key={s} stack={s} />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+            {STACK.map((s, i) => (
+              <div key={s} data-reveal="scale" data-reveal-delay={i * 35}>
+                <StackBar stack={s} />
+              </div>
             ))}
           </div>
         </section>
@@ -604,10 +719,8 @@ export default function Home() {
           <SectionHeader num="03" title="Work" />
           <div
             data-reveal
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
               padding: "22px 0",
               borderTop: "1px solid var(--line)",
             }}
@@ -652,7 +765,7 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "16px" }}>
+            <div className="shrink-0 text-left sm:text-right sm:ml-4 pl-[58px] sm:pl-0">
               <p
                 style={{
                   fontFamily: "var(--font-mono)",
@@ -663,7 +776,7 @@ export default function Home() {
               >
                 Mar 2026 — Jun 2026
               </p>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "6px" }}>
+              <div className="flex items-center gap-1.5 justify-start sm:justify-end">
                 <span style={{ position: "relative", display: "inline-flex", width: "7px", height: "7px" }}>
                   <span
                     style={{
@@ -728,10 +841,8 @@ export default function Home() {
           <SectionHeader num="05" title="Education" />
           <div
             data-reveal
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
               padding: "22px 0",
               borderTop: "1px solid var(--line)",
             }}
@@ -776,7 +887,7 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <div style={{ textAlign: "right", flexShrink: 0, marginLeft: "16px" }}>
+            <div className="shrink-0 text-left sm:text-right sm:ml-4 pl-[58px] sm:pl-0">
               <p
                 style={{
                   fontFamily: "var(--font-mono)",
@@ -807,9 +918,8 @@ export default function Home() {
           style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
         >
           <SectionHeader num="06" title="Awards" />
-          <div data-reveal>
-            <AwardsTimeline />
-          </div>
+          {/* Items reveal individually inside the component */}
+          <AwardsTimeline />
         </section>
 
         {/* ── 8. CERTIFICATIONS ────────────────────────────── */}
@@ -819,26 +929,22 @@ export default function Home() {
           style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
         >
           <SectionHeader num="07" title="Certifications" />
-          <div>
-            {CERT_LIST.map((cert, i) => (
-              <CertRow key={cert} index={i + 1} title={cert} />
-            ))}
-          </div>
+          {/* Rows reveal individually inside the component */}
+          <CertGallery />
         </section>
       </div>
 
       {/* ── 9. PULL-QUOTE BAND ──────────────────────────────── */}
       <div
         data-reveal
+        className="py-20 px-6 md:py-32 md:px-7"
         style={{
           position: "relative",
           left: "50%",
           width: "100vw",
           marginLeft: "-50vw",
           background: "var(--band-bg)",
-          padding: "128px 28px",
-          marginTop: "0",
-          marginBottom: "0",
+          overflowX: "clip",
         }}
       >
         <div
@@ -913,14 +1019,7 @@ export default function Home() {
       </div>
 
       {/* ── 10. CONTACT ─────────────────────────────────────── */}
-      <div
-        style={{
-          maxWidth: "920px",
-          margin: "0 auto",
-          padding: "0 28px",
-        }}
-        className="md:pl-28"
-      >
+      <div className="mx-auto max-w-[920px] pl-5 pr-5 md:pl-7 md:pr-7">
         <section
           id="contact"
           data-sec="contact"
@@ -931,14 +1030,7 @@ export default function Home() {
           }}
         >
           <SectionHeader num="08" title="Contact" />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "12px",
-            }}
-            className="grid-cols-1! md:grid-cols-2!"
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <ContactCard
               href="mailto:fernandozymer@gmail.com"
               icon={<Mail size={16} />}
@@ -995,24 +1087,19 @@ export default function Home() {
       </div>
 
       {/* ── FOOTER ──────────────────────────────────────────── */}
+      {/* Extra bottom padding on mobile clears the floating nav button. */}
       <footer
-        style={{
-          borderTop: "1px solid var(--line)",
-          paddingTop: "40px",
-          paddingBottom: "40px",
-        }}
+        className="pt-10 pb-28 md:pb-10"
+        style={{ borderTop: "1px solid var(--line)" }}
       >
         <div
+          className="mx-auto max-w-[920px] pl-5 pr-5 md:pl-7 md:pr-7"
           style={{
-            maxWidth: "920px",
-            margin: "0 auto",
-            padding: "0 28px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             gap: "10px",
           }}
-          className="md:pl-28"
         >
           <p
             style={{
@@ -1031,6 +1118,7 @@ export default function Home() {
               fontSize: "10px",
               color: "var(--faint)",
               letterSpacing: "0.08em",
+              textAlign: "center",
             }}
           >
             © {new Date().getFullYear()} · Designed & built with intent · Batangas, Philippines
@@ -1093,60 +1181,5 @@ function SocialIcon({
     >
       {children}
     </a>
-  );
-}
-
-function CertRow({ index, title }: { index: number; title: string }) {
-  return (
-    <div
-      data-reveal
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "14px 0",
-        borderTop: "1px solid var(--line)",
-        transition: "padding-left 0.3s ease",
-        gap: "16px",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.paddingLeft = "8px")}
-      onMouseLeave={(e) => (e.currentTarget.style.paddingLeft = "0px")}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <span
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "11.5px",
-            color: "var(--accent)",
-            letterSpacing: "0.12em",
-            flexShrink: 0,
-          }}
-        >
-          {String(index).padStart(2, "0")}
-        </span>
-        <span
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "15.5px",
-            fontWeight: 500,
-            color: "var(--ink)",
-          }}
-        >
-          {title}
-        </span>
-      </div>
-      <span
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "10px",
-          letterSpacing: "0.14em",
-          color: "var(--faint)",
-          textTransform: "uppercase",
-          flexShrink: 0,
-        }}
-      >
-        Certified
-      </span>
-    </div>
   );
 }

@@ -64,6 +64,12 @@ html {
   --rail-bg:     oklch(1 0 0 / 0.66);
   --shadow:      0 24px 60px -28px oklch(0.4 0.05 262 / 0.28);
 
+  /* Filled CTA (resume card). Inverted ink in light mode. */
+  --cta-bg:      var(--ink);
+  --cta-fg:      oklch(0.98 0.003 255);
+  --cta-fg-dim:  oklch(0.98 0.003 255 / 0.55);
+  --cta-tile:    oklch(1 0 0 / 0.12);
+
   /* ── shadcn/Tailwind compat ──────────────────────── */
   --background:           var(--bg);
   --foreground:           var(--ink);
@@ -112,6 +118,12 @@ html {
   --rail-bg:     oklch(0.24 0.014 262 / 0.7);
   --shadow:      0 28px 70px -28px oklch(0 0 0 / 0.6);
 
+  /* A near-white slab is blinding on a dark page — use the accent instead. */
+  --cta-bg:      oklch(0.52 0.15 256);
+  --cta-fg:      oklch(0.98 0.003 255);
+  --cta-fg-dim:  oklch(0.98 0.003 255 / 0.6);
+  --cta-tile:    oklch(1 0 0 / 0.15);
+
   /* ── shadcn/Tailwind compat ──────────────────────── */
   --background:           var(--bg);
   --foreground:           var(--ink);
@@ -158,23 +170,102 @@ html {
   }
 }
 
+/* ── Side rail ──────────────────────────────────────────
+   The rail's base look lives in inline styles on the component.
+   These are mobile-only overrides, so they need !important to
+   beat those inline styles. */
+
+/* The open/close button is mobile-only. */
+.rail-fab { display: none; }
+
+@media (max-width: 860px) {
+  .rail {
+    left: 10px !important;
+    gap: 1px !important;
+    padding: 8px 5px !important;
+    border-radius: 26px !important;
+    /* Tucked off-canvas by default so it never covers the content. */
+    transform: translate(calc(-100% - 18px), -50%) !important;
+    transition: transform 0.32s cubic-bezier(0.2, 0.65, 0.2, 1) !important;
+  }
+  .rail.rail-open {
+    transform: translate(0, -50%) !important;
+  }
+  .rail-avatar { width: 26px !important; height: 26px !important; }
+  .rail-hit    { width: 20px !important; height: 20px !important; }
+  .rail-toggle { width: 26px !important; height: 26px !important; }
+  .rail-div    { height: 12px !important; margin: 1px 0 !important; }
+  /* Hover labels are useless on touch and would overflow the screen. */
+  .rail-label  { display: none !important; }
+
+  .rail-fab {
+    display: flex;
+    position: fixed;
+    left: 14px;
+    bottom: 18px;
+    z-index: 70;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    color: var(--ink);
+    cursor: pointer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail { transition: none !important; }
+}
+
 /* ── Scroll reveal ──────────────────────────────────── */
 .reveal {
   opacity: 0;
   transform: translateY(22px);
   transition: opacity 0.75s cubic-bezier(0.2, 0.65, 0.2, 1),
               transform 0.75s cubic-bezier(0.2, 0.65, 0.2, 1);
+  will-change: opacity, transform;
 }
-.reveal.is-visible {
+
+/* Starting offsets — set via data-reveal="<name>".
+   These must come BEFORE the resting state: `.reveal[data-reveal="x"]` and
+   `.reveal.is-visible` have equal specificity (0,2,0), so whichever is
+   declared last wins. Resting state has to win. */
+.reveal[data-reveal="right"] { transform: translateX(26px); }
+.reveal[data-reveal="left"]  { transform: translateX(-26px); }
+.reveal[data-reveal="scale"] { transform: scale(0.955); }
+.reveal[data-reveal="fade"]  { transform: none; }
+
+/* Resting state. !important so no variant above can ever pin an element to its
+   starting offset. */
+.reveal.is-visible,
+.reveal.is-visible[data-reveal] {
   opacity: 1;
-  transform: translateY(0);
+  transform: none !important;
+  will-change: auto;
 }
+
+/* The hairline in a section header draws itself outward. Scoped to .reveal so
+   that without JS (reveal never armed) the line just renders normally. */
+.reveal .rule-line {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.9s cubic-bezier(0.2, 0.65, 0.2, 1) 0.15s;
+}
+.reveal.is-visible .rule-line {
+  transform: scaleX(1);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
+  .rule-line { transform: scaleX(1) !important; transition: none !important; }
 }
 
 /* ── Keyframes ──────────────────────────────────────── */
