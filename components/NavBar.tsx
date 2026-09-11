@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Sun, Moon, Menu, X } from "lucide-react";
 import Image from "next/image";
@@ -18,6 +19,7 @@ const SECTIONS = [
 ];
 
 export default function NavBar() {
+  const pathname = usePathname();
   const { resolvedTheme, setTheme } = useTheme();
   const [active, setActive] = useState("top");
   const [mounted, setMounted] = useState(false);
@@ -46,6 +48,10 @@ export default function NavBar() {
 
   const toggleTheme = () =>
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
+
+  // The rail is an index of the home page's sections, so it has nothing to
+  // point at on a standalone route — those pages carry their own back link.
+  if (pathname !== "/") return null;
 
   return (
     <>

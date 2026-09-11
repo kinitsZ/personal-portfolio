@@ -283,3 +283,285 @@ html {
   .animate-ping-avail,
   .animate-scroll-cue { animation: none; }
 }
+
+/* ── Project spread ─────────────────────────────────────
+   An editorial spread rather than a card: artwork, a paper slab that
+   breaks out over the artwork's bottom edge, and a mono credit column.
+
+   Entrance is one orchestrated sequence. Each layer does exactly one job
+   so the transforms never fight:
+     .ps-art       clip-path wipe (the plate being laid down)
+     .ps-parallax  scroll-driven drift
+     .ps-settle    entrance over-scale easing to rest
+     .ps-img       hover scale
+   Hidden states are armed by JS only after mount, so no-JS renders
+   everything visible. */
+
+.ps {
+  display: grid;
+  gap: 26px 30px;
+  grid-template-columns: 1fr;
+}
+
+/* ── Artwork ── */
+.ps-art {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  aspect-ratio: 16 / 10;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.95s cubic-bezier(0.16, 0.84, 0.28, 1);
+}
+.ps-parallax,
+.ps-settle {
+  position: absolute;
+  inset: 0;
+}
+.ps-settle {
+  --enter: 1;
+  transform: scale(var(--enter));
+  transition: transform 1.25s cubic-bezier(0.16, 0.84, 0.28, 1);
+}
+.ps-img {
+  --hov: 1;
+  object-fit: cover;
+  transform: scale(var(--hov));
+  transition: transform 0.65s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+
+/* ── Paper slab — overlaps the artwork's bottom edge ── */
+.ps-slab {
+  position: relative;
+  z-index: 2;
+  margin: -48px 14px 0 14px;
+  padding: 26px 28px 24px;
+  border-radius: 14px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  --lift: 0px;
+  transform: translateY(var(--lift));
+  transition: transform 0.6s cubic-bezier(0.2, 0.65, 0.2, 1),
+              opacity 0.6s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+/* Masks the title so it rises out of the slab's own edge. */
+.ps-titlemask { overflow: hidden; }
+.ps-title {
+  font-family: var(--font-serif);
+  font-size: clamp(27px, 4vw, 42px);
+  line-height: 1.04;
+  color: var(--ink);
+  transform: translateY(0);
+  transition: transform 0.85s cubic-bezier(0.16, 0.84, 0.28, 1);
+}
+.ps-desc {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.68;
+  color: var(--muted-text);
+  max-width: 46ch;
+  margin-top: 12px;
+}
+
+/* ── Credit column ── */
+.ps-credits {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-content: start;
+}
+.ps-rule {
+  height: 1px;
+  background: var(--line);
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform 0.8s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+.ps-tick {
+  display: block;
+  height: 1px;
+  width: 16px;
+  flex-shrink: 0;
+  background: var(--accent);
+  transition: width 0.35s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+.ps-item {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+
+/* ── Armed: the pre-entrance state, added by JS after mount ── */
+.ps.is-armed .ps-art      { clip-path: inset(0 100% 0 0); }
+.ps.is-armed .ps-settle   { --enter: 1.14; }
+.ps.is-armed .ps-slab     { opacity: 0; --lift: 22px; }
+.ps.is-armed .ps-title    { transform: translateY(105%); }
+.ps.is-armed .ps-rule     { transform: scaleX(0); }
+.ps.is-armed .ps-item     { opacity: 0; transform: translateY(14px); }
+
+/* ── Shown: resting state, with the sequence's delays ── */
+.ps.is-armed.is-shown .ps-art    { clip-path: inset(0 0 0 0); }
+.ps.is-armed.is-shown .ps-settle { --enter: 1; }
+.ps.is-armed.is-shown .ps-slab   { opacity: 1; --lift: 0px; transition-delay: 0.34s; }
+.ps.is-armed.is-shown .ps-title  { transform: translateY(0); transition-delay: 0.46s; }
+.ps.is-armed.is-shown .ps-rule   { transform: scaleX(1); transition-delay: 0.5s; }
+.ps.is-armed.is-shown .ps-item   { opacity: 1; transform: translateY(0); }
+.ps.is-armed.is-shown .ps-item:nth-child(1) { transition-delay: 0.58s; }
+.ps.is-armed.is-shown .ps-item:nth-child(2) { transition-delay: 0.64s; }
+.ps.is-armed.is-shown .ps-item:nth-child(3) { transition-delay: 0.70s; }
+
+/* ── Hover — composes with the entrance via separate custom properties ── */
+.ps:hover .ps-img,
+.ps:focus-within .ps-img { --hov: 1.045; }
+.ps:hover .ps-slab,
+.ps:focus-within .ps-slab { --lift: -6px; }
+.ps:hover .ps-tick,
+.ps:focus-within .ps-tick { width: 30px; }
+/* ── Link rows ──────────────────────────────────────────
+   The only interactive thing in a spread, so they carry real weight:
+   the icon-tile vocabulary from the Education and Contact blocks, with
+   the underline wiping in from the left — the same gesture as the
+   artwork's clip-path and the section rule. Order matters below; the
+   primary rules deliberately out-specify the generic hover. */
+
+.ps-link {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  text-decoration: none;
+  transition: transform 0.28s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+.ps-link + .ps-link { border-top: 1px solid var(--line); }
+.ps-link:hover,
+.ps-link:focus-visible { transform: translateX(3px); }
+
+.ps-link-tile {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  color: var(--muted-text);
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+.ps-link:hover .ps-link-tile,
+.ps-link:focus-visible .ps-link-tile {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Primary destination — the filled treatment already used by the resume CTA. */
+.ps-link[data-primary="true"] .ps-link-tile {
+  background: var(--cta-bg);
+  border-color: var(--cta-bg);
+  color: var(--cta-fg);
+}
+.ps-link[data-primary="true"]:hover .ps-link-tile,
+.ps-link[data-primary="true"]:focus-visible .ps-link-tile {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+.ps-link-text {
+  position: relative;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  transition: color 0.25s ease;
+}
+.ps-link-text::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+.ps-link:hover .ps-link-text,
+.ps-link:focus-visible .ps-link-text { color: var(--accent); }
+.ps-link:hover .ps-link-text::after,
+.ps-link:focus-visible .ps-link-text::after { transform: scaleX(1); }
+
+/* Marks a link as leaving the site. */
+.ps-link-ext {
+  color: var(--faint);
+  transition: transform 0.25s cubic-bezier(0.2, 0.65, 0.2, 1), color 0.25s ease;
+}
+.ps-link:hover .ps-link-ext,
+.ps-link:focus-visible .ps-link-ext {
+  color: var(--accent);
+  transform: translate(2px, -2px);
+}
+.ps-link-go {
+  transition: transform 0.25s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+.ps-link:hover .ps-link-go,
+.ps-link:focus-visible .ps-link-go { transform: translateX(3px); }
+
+/* ── Desktop: artwork and credits side by side, alternating ── */
+@media (min-width: 900px) {
+  .ps { grid-template-columns: minmax(0, 1fr) 232px; }
+  .ps-main    { grid-column: 1; grid-row: 1; }
+  .ps-credits { grid-column: 2; grid-row: 1; padding-top: 6px; }
+
+  .ps[data-flip="true"] .ps-main    { grid-column: 2; }
+  .ps[data-flip="true"] .ps-credits { grid-column: 1; }
+  /* The wipe opens from whichever edge the spread reads toward. Both rules
+     must out-specify the unflipped pair above, and the shown state must
+     out-specify the armed state — hence the extra class on the second. */
+  .ps[data-flip="true"].is-armed .ps-art { clip-path: inset(0 0 0 100%); }
+  .ps[data-flip="true"].is-armed.is-shown .ps-art { clip-path: inset(0 0 0 0); }
+  .ps-slab { margin: -66px 44px 0 26px; }
+  .ps[data-flip="true"] .ps-slab { margin: -66px 26px 0 44px; }
+}
+
+@media (min-width: 900px) {
+  .ps[data-flip="true"] { grid-template-columns: 232px minmax(0, 1fr); }
+}
+
+/* Scroll-driven drift. CSS-only, and simply absent where unsupported. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ps-parallax {
+      animation: ps-drift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+@keyframes ps-drift {
+  from { transform: translateY(-2.5%) scale(1.06); }
+  to   { transform: translateY(2.5%) scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-art, .ps-settle, .ps-slab, .ps-title, .ps-rule, .ps-item, .ps-img, .ps-tick,
+  .ps-link, .ps-link-tile, .ps-link-text, .ps-link-text::after, .ps-link-ext, .ps-link-go {
+    transition: none !important;
+  }
+  .ps.is-armed .ps-art,
+  .ps[data-flip="true"].is-armed .ps-art { clip-path: inset(0 0 0 0) !important; }
+  .ps.is-armed .ps-settle { --enter: 1 !important; }
+  .ps.is-armed .ps-slab   { opacity: 1 !important; --lift: 0px !important; }
+  .ps.is-armed .ps-title  { transform: translateY(0) !important; }
+  .ps.is-armed .ps-rule   { transform: scaleX(1) !important; }
+  .ps.is-armed .ps-item   { opacity: 1 !important; transform: none !important; }
+}

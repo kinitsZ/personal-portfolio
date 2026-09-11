@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ArrowUpRight, BookOpen, Github, Globe } from "lucide-react";
 
 type ProjectCardProps = {
   title: string;
@@ -9,8 +11,50 @@ type ProjectCardProps = {
   imageUrl?: string;
   siteUrl?: string;
   githubUrl?: string;
+  /** Internal route for a write-up of this project, e.g. "/projects/slug". */
+  caseStudyUrl?: string;
   tag?: string;
+  /** Mirrors the spread so consecutive projects alternate sides. */
+  flip?: boolean;
 };
+
+/**
+ * Arms the pre-entrance state only after mount — server-rendered and no-JS
+ * output stays fully visible — then plays the sequence once on first sight.
+ * Drives classes on the node directly, the same way RevealObserver does, so
+ * the entrance never costs a React render.
+ */
+function useSpreadEntrance() {
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    el.classList.add("is-armed");
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.classList.add("is-shown");
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-shown");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return ref;
+}
 
 const ProjectCard = ({
   title,
@@ -18,135 +62,147 @@ const ProjectCard = ({
   imageUrl,
   siteUrl,
   githubUrl,
+  caseStudyUrl,
   tag,
+  flip,
 }: ProjectCardProps) => {
+  const ref = useSpreadEntrance();
+
+  // Ordered by importance — the first gets the filled, primary treatment.
+  const links: LinkSpec[] = [
+    caseStudyUrl && {
+      href: caseStudyUrl,
+      label: "Read case study",
+      kind: "case" as const,
+    },
+    siteUrl && { href: siteUrl, label: "Live site", kind: "site" as const },
+    githubUrl && { href: githubUrl, label: "Source", kind: "source" as const },
+  ].filter(Boolean) as LinkSpec[];
+
   return (
-    <div
-      style={{
-        borderRadius: "18px",
-        background: "var(--bg2)",
-        border: "1px solid var(--line)",
-        overflow: "hidden",
-        transition: "transform 0.25s ease, box-shadow 0.25s ease",
-      }}
-      className="grid grid-cols-1 sm:grid-cols-[200px_1fr]"
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.boxShadow = "var(--shadow)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.boxShadow = "none";
-      }}
-    >
-      {/* Image panel — divider sits below when stacked, right when side-by-side */}
-      <div
-        style={{
-          background: "var(--bg)",
-          position: "relative",
-          minHeight: "180px",
-        }}
-        className="border-b border-(--line) sm:border-b-0 sm:border-r"
-      >
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={title}
-            fill
-            sizes="(max-width: 640px) 100vw, 200px"
-            style={{ objectFit: "contain", padding: "20px" }}
-          />
-        ) : (
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: "linear-gradient(135deg, var(--bg2), var(--line))",
-            }}
-          />
-        )}
-      </div>
+    <article ref={ref} className="ps" data-flip={flip ? "true" : undefined}>
+      <div className="ps-main">
+        <div className="ps-art">
+          <div className="ps-parallax">
+            <div className="ps-settle">
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  /* Decorative: the title sits right beside it, so a
+                     descriptive alt would just be announced twice. */
+                  alt=""
+                  fill
+                  sizes="(max-width: 900px) 100vw, 640px"
+                  className="ps-img"
+                />
+              ) : (
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background:
+                      "linear-gradient(135deg, var(--bg2), var(--line))",
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
 
-      {/* Body */}
-      <div
-        className="p-6 sm:px-8 sm:py-7"
-        style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}
-      >
-        {tag && (
-          <p
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: "10.5px",
-              letterSpacing: "0.16em",
-              color: "var(--faint)",
-              textTransform: "uppercase",
-              marginBottom: "10px",
-            }}
-          >
-            {tag}
-          </p>
-        )}
-
-        <h3
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontSize: "22px",
-            color: "var(--ink)",
-            lineHeight: 1.15,
-            marginBottom: "12px",
-          }}
-        >
-          {title}
-        </h3>
-
-        <p
-          style={{
-            fontFamily: "var(--font-sans)",
-            fontSize: "14px",
-            lineHeight: 1.6,
-            color: "var(--muted-text)",
-            maxWidth: "54ch",
-            marginBottom: "20px",
-          }}
-        >
-          {description}
-        </p>
-
-        <div style={{ display: "flex", gap: "20px" }}>
-          {siteUrl && (
-            <ProjectLink href={siteUrl} label="Live site" />
-          )}
-          {githubUrl && (
-            <ProjectLink href={githubUrl} label="Source" />
-          )}
+        {/* Paper slab, breaking out over the artwork's bottom edge */}
+        <div className="ps-slab">
+          <div className="ps-titlemask">
+            <h3 className="ps-title">{title}</h3>
+          </div>
+          <p className="ps-desc">{description}</p>
         </div>
       </div>
-    </div>
+
+      <div className="ps-credits">
+        {tag && (
+          <div className="ps-item flex items-center gap-2.5">
+            <span aria-hidden="true" className="ps-tick" />
+            <p
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "10.5px",
+                letterSpacing: "0.16em",
+                color: "var(--faint)",
+                textTransform: "uppercase",
+              }}
+            >
+              {tag}
+            </p>
+          </div>
+        )}
+
+        <div className="ps-item ps-rule" aria-hidden="true" />
+
+        <div className="ps-item flex flex-col">
+          {links.map((link, i) => (
+            <ProjectLink key={link.href} {...link} primary={i === 0} />
+          ))}
+        </div>
+      </div>
+    </article>
   );
 };
 
-function ProjectLink({ href, label }: { href: string; label: string }) {
+type LinkSpec = {
+  href: string;
+  label: string;
+  kind: "case" | "site" | "source";
+};
+
+const LINK_ICON = {
+  case: BookOpen,
+  site: Globe,
+  source: Github,
+} as const;
+
+function ProjectLink({
+  href,
+  label,
+  kind,
+  primary,
+}: LinkSpec & { primary?: boolean }) {
+  const Icon = LINK_ICON[kind];
+  /* Only the case study is a route on this site; the rest leave it. */
+  const internal = kind === "case";
+
+  const body = (
+    <>
+      <span className="ps-link-tile">
+        <Icon size={15} aria-hidden="true" />
+      </span>
+      <span className="ps-link-text">
+        {label}
+        {internal ? (
+          <ArrowRight size={13} aria-hidden="true" className="ps-link-go" />
+        ) : (
+          <ArrowUpRight size={13} aria-hidden="true" className="ps-link-ext" />
+        )}
+      </span>
+    </>
+  );
+
+  if (internal) {
+    return (
+      <Link href={href} className="ps-link" data-primary={primary || undefined}>
+        {body}
+      </Link>
+    );
+  }
+
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "4px",
-        fontFamily: "var(--font-sans)",
-        fontSize: "13px",
-        fontWeight: 500,
-        color: "var(--muted-text)",
-        textDecoration: "underline",
-        textUnderlineOffset: "3px",
-        transition: "color 0.2s ease",
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.color = "var(--accent)")}
-      onMouseLeave={(e) => (e.currentTarget.style.color = "var(--muted-text)")}
+      className="ps-link"
+      data-primary={primary || undefined}
     >
-      {label} <ArrowUpRight size={13} />
+      {body}
     </a>
   );
 }

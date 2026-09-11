@@ -6,43 +6,10 @@ import AwardsTimeline from "@/components/AwardsTimeline";
 import ProjectCard from "@/components/ProjectCard";
 import StackBar from "@/components/StackBar";
 import RevealObserver from "@/components/RevealObserver";
+import SectionHeader from "@/components/SectionHeader";
 import CertGallery from "@/components/CertGallery";
 
 /* ── Reusable sub-components ────────────────────────────── */
-
-function SectionHeader({ num, title }: { num: string; title: string }) {
-  return (
-    <div data-reveal className="flex items-center gap-4 mb-10">
-      <span
-        style={{
-          fontFamily: "var(--font-mono)",
-          color: "var(--accent)",
-          letterSpacing: "0.18em",
-          fontSize: "11px",
-          fontWeight: 400,
-          flexShrink: 0,
-        }}
-      >
-        {num}
-      </span>
-      <h2
-        style={{
-          fontFamily: "var(--font-serif)",
-          color: "var(--ink)",
-          lineHeight: 0.95,
-          fontSize: "clamp(30px, 4.4vw, 48px)",
-          flexShrink: 0,
-        }}
-      >
-        {title}
-      </h2>
-      <div
-        className="rule-line"
-        style={{ height: "1px", background: "var(--line)", flex: 1 }}
-      />
-    </div>
-  );
-}
 
 function ContactCard({
   href,
@@ -820,7 +787,8 @@ export default function Home() {
           style={{ scrollMarginTop: "48px", paddingTop: "64px", paddingBottom: "64px" }}
         >
           <SectionHeader num="04" title="Projects" />
-          <div data-reveal>
+          {/* Spreads run their own entrance, so no data-reveal wrapper here. */}
+          <div className="flex flex-col gap-16 md:gap-24">
             <ProjectCard
               title="WikaWonders Kids"
               description="An interactive learning platform helping Filipino children pick up language through playful games and activities — built to be engaging, accessible, and genuinely fun."
@@ -828,6 +796,14 @@ export default function Home() {
               siteUrl="https://wikawonderskids.com"
               githubUrl="https://github.com/kinitsZ/wikawonders-kids-2025"
               tag="Educational Platform"
+            />
+            <ProjectCard
+              title="Job Application Tracker"
+              description="Two n8n automations — one event-driven, one scheduled — that log job applications from a Google Form and surface stale follow-ups."
+              imageUrl="/images/projects/job-tracker/workflow-1-canvas.png"
+              caseStudyUrl="/projects/job-application-tracker"
+              tag="Automation"
+              flip
             />
           </div>
         </section>
