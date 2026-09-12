@@ -3,19 +3,35 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Menu, X } from "lucide-react";
+import {
+  Sun,
+  Moon,
+  Menu,
+  X,
+  Home,
+  User,
+  Layers,
+  Briefcase,
+  FolderOpen,
+  GraduationCap,
+  Trophy,
+  BadgeCheck,
+  Mail,
+} from "lucide-react";
 import Image from "next/image";
 
+/* Work, Education and Contact reuse the same icons those sections use on the
+   page itself, so the rail reads as an index of what's below. */
 const SECTIONS = [
-  { id: "top",       label: "Home" },
-  { id: "about",     label: "About" },
-  { id: "stack",     label: "Stack" },
-  { id: "work",      label: "Work" },
-  { id: "projects",  label: "Projects" },
-  { id: "education", label: "Education" },
-  { id: "awards",    label: "Awards" },
-  { id: "certs",     label: "Certifications" },
-  { id: "contact",   label: "Contact" },
+  { id: "top",       label: "Home",           Icon: Home },
+  { id: "about",     label: "About",          Icon: User },
+  { id: "stack",     label: "Stack",          Icon: Layers },
+  { id: "work",      label: "Work",           Icon: Briefcase },
+  { id: "projects",  label: "Projects",       Icon: FolderOpen },
+  { id: "education", label: "Education",      Icon: GraduationCap },
+  { id: "awards",    label: "Awards",         Icon: Trophy },
+  { id: "certs",     label: "Certifications", Icon: BadgeCheck },
+  { id: "contact",   label: "Contact",        Icon: Mail },
 ];
 
 export default function NavBar() {
@@ -67,7 +83,7 @@ export default function NavBar() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "6px",
+        gap: "3px",
         background: "var(--rail-bg)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
@@ -118,8 +134,8 @@ export default function NavBar() {
         }}
       />
 
-      {/* Section dots */}
-      {SECTIONS.map(({ id, label }) => {
+      {/* Section icons */}
+      {SECTIONS.map(({ id, label, Icon }) => {
         const isActive = active === id;
         return (
           <a
@@ -128,54 +144,14 @@ export default function NavBar() {
             aria-label={label}
             aria-current={isActive ? "true" : undefined}
             onClick={() => setOpen(false)}
-            className="group/dot rail-hit"
-            style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "24px",
-              height: "24px",
-              flexShrink: 0,
-            }}
+            className="rail-hit"
           >
-            {/* Dot */}
-            <span
-              className="group-hover/dot:bg-accent!"
-              style={{
-                display: "block",
-                width: "7px",
-                height: "7px",
-                borderRadius: "50%",
-                background: isActive ? "var(--accent)" : "var(--faint)",
-                transform: isActive ? "scale(1.55)" : "scale(1)",
-                transition: "background 0.2s ease, transform 0.2s ease",
-              }}
-            />
-
-            {/* Hover label */}
-            <span
-              className="rail-label group-hover/dot:opacity-100! group-hover/dot:translate-x-0!"
-              style={{
-                position: "absolute",
-                left: "calc(100% + 10px)",
-                whiteSpace: "nowrap",
-                background: "var(--bg2)",
-                border: "1px solid var(--line)",
-                borderRadius: "7px",
-                boxShadow: "var(--shadow)",
-                padding: "3px 9px",
-                fontSize: "11px",
-                color: "var(--ink)",
-                fontFamily: "var(--font-sans)",
-                pointerEvents: "none",
-                opacity: 0,
-                transform: "translateX(-5px)",
-                transition: "opacity 0.18s ease, transform 0.18s ease",
-              }}
-            >
-              {label}
+            {/* The glyph is what magnifies — keeping it off the anchor means
+                the label below never scales with it. */}
+            <span className="rail-glyph">
+              <Icon size={15} aria-hidden="true" />
             </span>
+            <span className="rail-label">{label}</span>
           </a>
         );
       })}
