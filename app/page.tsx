@@ -805,6 +805,13 @@ export default function Home() {
               tag="Automation"
               flip
             />
+            <ProjectCard
+              title="n8n Automation Suite"
+              description="Two production n8n workflows that automate email attachment archiving and AI-powered receipt processing, built as a technical assessment."
+              imageUrl="/images/projects/pds-workflows/WF1_Canvas.png"
+              caseStudyUrl="/projects/n8n-automation-suite"
+              tag="Automation / AI"
+            />
           </div>
         </section>
 
