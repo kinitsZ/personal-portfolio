@@ -669,3 +669,414 @@ html {
   .ps.is-armed .ps-rule   { transform: scaleX(1) !important; }
   .ps.is-armed .ps-item   { opacity: 1 !important; transform: none !important; }
 }
+
+/* ── Case study ─────────────────────────────────────────
+   A documentation surface with its own material language, scoped to `.cs` so
+   none of it leaks into the home page:
+     · code is a dark slab in BOTH themes, so it reads as its own material
+       rather than one more tinted rectangle
+     · plates break out past the text column, edge-to-edge on phones
+     · steps carry an oversized numeral in the margin
+   Entrance rides the shared .reveal classes, so nothing here needs a second
+   observer — and under reduced motion RevealObserver never arms .reveal, so
+   every resting state below is also the default state. */
+
+.cs {
+  /* How far a plate breaks out of the text column on each side. Stepped by
+     breakpoint rather than computed from 100vw, which would overshoot by half
+     a scrollbar and put the page into horizontal scroll. Below 1024px this
+     exactly cancels the container's padding, so plates go edge-to-edge. */
+  --cs-bleed: 20px;
+
+  --code-bg:    oklch(0.203 0.014 262);
+  --code-tab:   oklch(0.252 0.015 262);
+  --code-ink:   oklch(0.93 0.006 262);
+  --code-faint: oklch(0.575 0.016 262);
+  --code-line:  oklch(0.325 0.013 262);
+  --code-key:   oklch(0.8 0.105 256);
+}
+@media (min-width: 768px)  { .cs { --cs-bleed: 28px; } }
+@media (min-width: 1024px) { .cs { --cs-bleed: 72px; } }
+@media (min-width: 1280px) { .cs { --cs-bleed: 120px; } }
+
+/* ── Masthead spec strip ──
+   Hairline grid built from gaps over a --line background, so the rules are
+   always exactly 1px and never double up at the cells' shared edges. */
+.cs-meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+}
+@media (min-width: 720px) {
+  .cs-meta { grid-template-columns: repeat(4, 1fr); }
+}
+.cs-meta-cell {
+  background: var(--bg);
+  padding: 15px 17px;
+}
+.cs-meta-key {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 7px;
+}
+.cs-meta-val {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+/* ── Section header ──
+   An outlined numeral at display scale. The stroke reads as a drawn figure
+   rather than a label, which is the whole point — it sets the chapter. */
+.cs-sec {
+  /* Grid, not flex: these titles are long enough to need to wrap, and a
+     flex row with non-shrinking children would run off a phone screen. The
+     rule then spans the full width underneath rather than trailing off. */
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  column-gap: 16px;
+  row-gap: 12px;
+  margin-bottom: 30px;
+}
+.cs-sec-rule {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: var(--line);
+}
+.cs-sec-num {
+  font-family: var(--font-mono);
+  font-size: clamp(40px, 8vw, 78px);
+  line-height: 0.82;
+  font-weight: 500;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--accent);
+  flex-shrink: 0;
+  transition: -webkit-text-stroke-color 0.6s ease;
+}
+/* Greys out only while the entrance is armed, so no-JS and reduced-motion
+   readers get the resting colour rather than the pre-animation one. */
+.reveal .cs-sec-num { -webkit-text-stroke-color: var(--line); }
+.cs-sec-title {
+  font-family: var(--font-serif);
+  font-size: clamp(29px, 4.6vw, 50px);
+  line-height: 0.95;
+  color: var(--ink);
+  min-width: 0;
+}
+.reveal.is-visible .cs-sec-num { -webkit-text-stroke-color: var(--accent); }
+
+/* ── Plate: a screenshot or video that outgrows the text column ── */
+.cs-plate {
+  margin-inline: calc(-1 * var(--cs-bleed));
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
+  overflow: hidden;
+  line-height: 0;
+  box-shadow: var(--shadow);
+}
+/* Edge-to-edge on phones: side borders and corners would just fence it in. */
+@media (max-width: 767px) {
+  .cs-plate {
+    border-radius: 0;
+    border-inline: 0;
+  }
+}
+/* The wipe. Driven from a wrapper that carries `data-reveal`, never from the
+   plate itself: Chrome factors an element's own clip-path into intersection,
+   so a plate clipped to zero width would never report as intersecting, would
+   never be given .is-visible, and would stay invisible forever. The project
+   spread on the home page splits these the same way. */
+.cs-plate {
+  transition: clip-path 1.05s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+.reveal .cs-plate { clip-path: inset(0 100% 0 0); }
+.reveal.is-visible .cs-plate { clip-path: inset(0 0 0 0); }
+
+.cs-cap {
+  margin-top: 12px;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted-text);
+}
+/* A plate's caption sits back inside the column the plate broke out of. */
+.cs-plate + .cs-cap { padding-inline: 2px; }
+
+/* ── Code slab ── */
+.cs-code {
+  border-radius: 14px;
+  border: 1px solid var(--code-line);
+  background: var(--code-bg);
+  overflow: hidden;
+  box-shadow: 0 20px 44px -28px oklch(0.15 0.02 262 / 0.55);
+}
+.cs-code-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 10px 14px;
+  background: var(--code-tab);
+  border-bottom: 1px solid var(--code-line);
+}
+.cs-code-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.cs-code-name {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--code-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cs-code-copy {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  padding: 4px 9px;
+  border-radius: 7px;
+  background: transparent;
+  border: 1px solid var(--code-line);
+  color: var(--code-faint);
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.cs-code-copy:hover,
+.cs-code-copy:focus-visible {
+  color: var(--code-ink);
+  border-color: var(--code-faint);
+}
+.cs-code-body {
+  overflow-x: auto;
+  padding: 14px 0;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.75;
+  /* `===` and `=>` would otherwise collapse into single ligature glyphs. */
+  font-variant-ligatures: none;
+  tab-size: 2;
+}
+.cs-code-line { display: flex; }
+.cs-code-num {
+  flex: 0 0 46px;
+  text-align: right;
+  padding-right: 16px;
+  color: var(--code-faint);
+  opacity: 0.55;
+  user-select: none;
+}
+.cs-code-txt {
+  white-space: pre;
+  padding-right: 20px;
+  color: var(--code-ink);
+}
+/* Line-level cues, no parser: a comment line dims, and the key half of an
+   n8n `field = expression` line takes the accent. */
+.cs-code-cmt { color: var(--code-faint); font-style: italic; }
+.cs-code-key { color: var(--code-key); }
+
+/* ── Step: a numbered move within a workflow ── */
+.cs-step {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-top: 44px;
+  margin-bottom: 14px;
+}
+@media (min-width: 1080px) {
+  .cs-step {
+    grid-template-columns: 76px 1fr;
+    /* Pulls the numeral into the margin without narrowing the prose. */
+    margin-left: -76px;
+  }
+}
+.cs-step-num {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 34px;
+  line-height: 1;
+  color: var(--accent);
+  /* Only spaces off the title while the two are stacked. */
+  margin-bottom: 6px;
+}
+@media (min-width: 1080px) {
+  .cs-step-num { margin-bottom: 0; }
+}
+.cs-step-title {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink);
+  align-self: center;
+}
+
+/* ── Aside: the thing that would otherwise be buried in a paragraph ── */
+.cs-aside {
+  position: relative;
+  margin: 24px 0 30px;
+  padding: 17px 20px 17px 23px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  max-width: 70ch;
+}
+.cs-aside::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 13px;
+  bottom: 13px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.cs-aside-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.cs-aside-body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+/* ── Flow chain ── */
+.cs-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 14px 7px 8px;
+  border-radius: 999px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--muted-text);
+  white-space: nowrap;
+  font-variant-ligatures: none;
+  transition: transform 0.28s cubic-bezier(0.2, 0.65, 0.2, 1),
+              border-color 0.2s ease, color 0.2s ease;
+}
+.cs-node:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.cs-node-i {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  font-size: 9px;
+  color: var(--accent);
+}
+
+/* ── Contents rail ──
+   Mirrors the nav rail's language on the opposite edge. Only appears once
+   there is room beside the widest plate, so the two never collide. */
+.cs-rail { display: none; }
+@media (min-width: 1200px) {
+  .cs-rail {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    position: fixed;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 40;
+  }
+}
+.cs-rail-hit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  height: 30px;
+  text-decoration: none;
+}
+.cs-rail-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--faint);
+  transition: color 0.25s ease;
+}
+.cs-rail-tick {
+  display: block;
+  height: 1px;
+  width: 15px;
+  background: var(--line);
+  transition: width 0.35s cubic-bezier(0.2, 0.65, 0.2, 1),
+              background 0.25s ease;
+}
+.cs-rail-hit:hover .cs-rail-num,
+.cs-rail-hit:focus-visible .cs-rail-num { color: var(--ink); }
+.cs-rail-hit:hover .cs-rail-tick,
+.cs-rail-hit:focus-visible .cs-rail-tick { width: 26px; background: var(--faint); }
+/* Active colours follow hover, so the current section stays lit when the
+   pointer is somewhere else. */
+.cs-rail-hit[aria-current="true"] .cs-rail-num { color: var(--accent); }
+.cs-rail-hit[aria-current="true"] .cs-rail-tick {
+  width: 30px;
+  background: var(--accent);
+}
+.cs-rail-label {
+  position: absolute;
+  right: calc(100% + 11px);
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(6px);
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.2, 0.65, 0.2, 1);
+}
+.cs-rail-hit:hover .cs-rail-label,
+.cs-rail-hit:focus-visible .cs-rail-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-node:hover { transform: none; }
+  .cs-rail-tick,
+  .cs-rail-label { transition: none; }
+}
